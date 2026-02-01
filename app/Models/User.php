@@ -53,4 +53,15 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function spaces()
+    {
+        return $this->belongsToMany(Space::class, 'space_user')
+            ->withTimestamps();
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
 }
