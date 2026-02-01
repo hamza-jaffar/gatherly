@@ -6,6 +6,7 @@ use App\Helpers\FileHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\ActivityLog;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,6 +34,8 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
+        $oldValues = $user->getAttributes();
+
         // Update basic profile fields
         $user->fill($request->validated());
 
@@ -52,6 +55,21 @@ class ProfileController extends Controller
 
         $user->save();
 
+        $changes = $user->getChanges();
+
+        if (! empty($changes)) {
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'update',
+                'resource_type' => 'profile',
+                'resource_id' => $user->id,
+                'old_values' => array_intersect_key($oldValues, $changes),
+                'new_values' => $changes,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        }
+
         return to_route('profile.edit')
             ->with('success', 'Profile updated successfully.');
     }
@@ -64,6 +82,15 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
+
+        ActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'deleted',
+            'resource_type' => 'user',
+            'resource_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         $user->delete();
 
