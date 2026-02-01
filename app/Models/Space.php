@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Space extends Model
 {
     use SoftDeletes;
+    
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     protected $fillable = [
         'name',
@@ -20,6 +25,13 @@ class Space extends Model
     public function owner()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_private' => 'boolean',
+        ];
     }
 
     public function users()

@@ -9,6 +9,24 @@ export type Flash = {
     error: string;
 };
 
+export type Pagination<T> = {
+    data: T[];
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+    meta: {
+        current_page: number;
+        from: number;
+        last_page: number;
+        path: string;
+        per_page: number;
+        to: number;
+        total: number;
+    };
+};
+
 export type SharedData = {
     name: string;
     auth: Auth;

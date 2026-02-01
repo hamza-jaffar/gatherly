@@ -59,4 +59,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Space::class, 'space_user')
             ->withTimestamps();
     }
+
+    public function logs()
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
 }
