@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Helpers\FileHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
@@ -30,15 +31,29 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Update basic profile fields
+        $user->fill($request->validated());
+
+        // Handle profile picture upload
+        if ($request->hasFile('avatar')) {
+            $user->avatar = FileHelper::replace(
+                $user->avatar,
+                $request->file('avatar'),
+                'avatars'
+            );
         }
 
-        $request->user()->save();
+        // Reset email verification if email changed
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
 
-        return to_route('profile.edit');
+        $user->save();
+
+        return to_route('profile.edit')
+            ->with('success', 'Profile updated successfully.');
     }
 
     /**
