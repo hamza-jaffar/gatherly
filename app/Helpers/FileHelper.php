@@ -43,21 +43,11 @@ class FileHelper
         ?string $path,
         string $disk = 'public'
     ): bool {
-        if (! $path) {
+        if (! $path || ! Storage::disk($disk)->exists($path)) {
             return false;
         }
 
-        if (Storage::disk($disk)->exists($path)) {
-            return Storage::disk($disk)->delete($path);
-        }
-
-        // Fallback: Try native PHP unlink
-        $fullPath = Storage::disk($disk)->path($path);
-        if (file_exists($fullPath)) {
-            return unlink($fullPath);
-        }
-
-        return false;
+        return Storage::disk($disk)->delete($path);
     }
 
     /**
