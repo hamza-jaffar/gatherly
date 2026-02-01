@@ -82,7 +82,7 @@ class SpaceController extends Controller
      */
     public function destroy(Space $space)
     {
-        SpaceService::delete($space);
+        SpaceService::delete($space->slug);
 
         return to_route('space.index')
             ->with('success', 'Space deleted successfully.');

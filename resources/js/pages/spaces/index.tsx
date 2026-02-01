@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react'; // Import router instead of useForm for simple search
+import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,16 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
     BreadcrumbItem,
     Pagination as PaginationType,
@@ -54,6 +63,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function SpaceIndex({ spaces, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
+    const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
 
     // Debounce search
     useEffect(() => {
@@ -70,9 +80,11 @@ export default function SpaceIndex({ spaces, filters }: Props) {
         return () => clearTimeout(timer);
     }, [search]);
 
-    const handleDelete = (slug: string) => {
-        if (confirm('Are you sure you want to delete this space?')) {
-            router.delete(spaceRoute.destroy(slug).url);
+    const confirmDelete = () => {
+        if (deleteSlug) {
+            router.delete(spaceRoute.destroy(deleteSlug).url, {
+                onFinish: () => setDeleteSlug(null),
+            });
         }
     };
 
@@ -191,7 +203,9 @@ export default function SpaceIndex({ spaces, filters }: Props) {
                                                     size="icon"
                                                     className="text-destructive hover:text-destructive"
                                                     onClick={() =>
-                                                        handleDelete(space.slug)
+                                                        setDeleteSlug(
+                                                            space.slug,
+                                                        )
                                                     }
                                                 >
                                                     <Trash className="h-4 w-4" />
@@ -217,6 +231,32 @@ export default function SpaceIndex({ spaces, filters }: Props) {
                     ))}
                 </div>
             </div>
+
+            <AlertDialog
+                open={!!deleteSlug}
+                onOpenChange={() => setDeleteSlug(null)}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the space and remove it from our servers.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDelete}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }
