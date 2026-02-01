@@ -13,9 +13,7 @@ use Illuminate\Http\Request;
 
 class UserActivityListener
 {
-    public function __construct(protected Request $request)
-    {
-    }
+    public function __construct(protected Request $request) {}
 
     public function subscribe(Dispatcher $events): array
     {

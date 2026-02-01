@@ -14,6 +14,7 @@ import { send } from '@/routes/verification';
 import type { BreadcrumbItem, SharedData } from '@/types';
 import { useRef, useState } from 'react';
 import { Camera, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,13 +45,13 @@ export default function Profile({
 
         // Validate file size (2MB)
         if (file.size > 2 * 1024 * 1024) {
-            // toast.error('File size must be less than 2MB');
+            toast.error('File size must be less than 2MB');
             return;
         }
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            // toast.error('Please select a valid image file');
+            toast.error('Please select a valid image file');
             return;
         }
 
