@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         Schema::defaultStringLength(191);
+        \Illuminate\Support\Facades\Event::subscribe(\App\Listeners\UserActivityListener::class);
     }
 
     protected function configureDefaults(): void
