@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Helpers\SlugHelper;
 use App\Models\ActivityLog;
 use App\Models\Space;
+use App\Models\User;
+use App\Services\SubscriptionService;
 use Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -56,6 +58,12 @@ class SpaceService
 
     public static function create(array $data, int $userId): Space
     {
+        $user = User::findOrFail($userId);
+
+        if (!SubscriptionService::canCreateSpace($user)) {
+            throw new \RuntimeException('You have reached the maximum number of spaces allowed for your plan.');
+        }
+
         return DB::transaction(function () use ($data, $userId) {
             $slug = SlugHelper::create($data['name'], 'spaces');
 
