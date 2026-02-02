@@ -7,6 +7,7 @@ use App\Http\Requests\StoreSpaceRequest;
 use App\Http\Requests\UpdateSpaceRequest;
 use App\Models\Space;
 use App\Services\SpaceService;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -83,10 +84,19 @@ class SpaceController extends Controller
      */
     public function update(UpdateSpaceRequest $request, Space $space)
     {
-        SpaceService::edit($space, $request->validated());
+        try {
 
-        return to_route('space.index')
-            ->with('success', 'Space updated successfully.');
+            $user = Auth::user();
+
+            SpaceService::edit($space, $request->validated(), $user->id);
+
+            return to_route('space.index')
+                ->with('success', 'Space updated successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to update space: '.$e->getMessage());
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -94,9 +104,18 @@ class SpaceController extends Controller
      */
     public function destroy(Space $space)
     {
-        SpaceService::delete($space->slug);
+        try {
 
-        return to_route('space.index')
-            ->with('success', 'Space deleted successfully.');
+            $user = Auth::user();
+
+            SpaceService::delete($space->slug, $user->id);
+
+            return to_route('space.index')
+                ->with('success', 'Space deleted successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to delete space: '.$e->getMessage());
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 }
