@@ -60,6 +60,16 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function ownedSpaces()
+    {
+        return $this->hasMany(Space::class, 'created_by');
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(UserSubscription::class)->latestOfMany();
+    }
+
     public function logs()
     {
         return $this->hasMany(ActivityLog::class);

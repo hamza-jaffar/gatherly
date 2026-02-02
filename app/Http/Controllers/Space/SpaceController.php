@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateSpaceRequest;
 use App\Models\Space;
 use App\Services\SpaceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class SpaceController extends Controller
@@ -42,10 +43,16 @@ class SpaceController extends Controller
      */
     public function store(StoreSpaceRequest $request)
     {
-        SpaceService::create($request->validated(), $request->user()->id);
+        try {
+            SpaceService::create($request->validated(), $request->user()->id);
 
-        return to_route('space.index')
-            ->with('success', 'Space created successfully.');
+            return to_route('space.index')
+                ->with('success', 'Space created successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to create space: '.$e->getMessage());
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     /**
@@ -53,7 +60,7 @@ class SpaceController extends Controller
      */
     public function show(Space $space)
     {
-         $space->load('owner');
+        $space->load('owner');
 
         return Inertia::render('spaces/show', [
             'space' => $space,
