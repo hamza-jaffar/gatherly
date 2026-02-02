@@ -60,6 +60,7 @@ class SpaceController extends Controller
      */
     public function show(Space $space)
     {
+
         $space->load('owner');
 
         return Inertia::render('spaces/show', [
