@@ -5,26 +5,15 @@ import { BreadcrumbItem, SharedData } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Edit } from 'lucide-react';
 import spaceRoute from '@/routes/space';
-
-interface Space {
-    id: number;
-    name: string;
-    description: string;
-    slug: string;
-    is_private: boolean;
-    created_at: string;
-    owner: {
-        id: number;
-        first_name: string;
-        last_name: string;
-    };
-}
+import { Space } from '@/types/space';
+import { UserInfo } from '@/components/user-info';
 
 interface Props {
     space: Space;
 }
 
 export default function SpaceShow({ space }: Props) {
+    const { auth } = usePage<SharedData>().props;
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Spaces',
@@ -57,12 +46,14 @@ export default function SpaceShow({ space }: Props) {
                             URL: {spaceRoute.show(space.slug).url}
                         </p>
                     </div>
-                    <Link href={spaceRoute.edit(space.slug).url}>
-                        <Button variant="outline">
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Space
-                        </Button>
-                    </Link>
+                    {space.owner.id === auth.user?.id && (
+                        <Link href={spaceRoute.edit(space.slug).url}>
+                            <Button variant="outline">
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit Space
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <div className="space-y-4">
@@ -76,17 +67,16 @@ export default function SpaceShow({ space }: Props) {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                             <span className="font-semibold text-foreground">
-                                Created By:
-                            </span>{' '}
-                            <span className="text-muted-foreground">
-                                {space.owner?.first_name}{' '}
-                                {space.owner?.last_name}
+                                Owner:
                             </span>
+                            <div className="mt-2 flex items-center gap-2">
+                                <UserInfo user={space.owner} showEmail />
+                            </div>
                         </div>
                         <div>
                             <span className="font-semibold text-foreground">
                                 Created At:
-                            </span>{' '}
+                            </span>
                             <span className="text-muted-foreground">
                                 {new Date(
                                     space.created_at,
