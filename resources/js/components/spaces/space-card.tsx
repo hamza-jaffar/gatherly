@@ -46,8 +46,8 @@ export function SpaceCard({ space, onDelete }: SpaceCardProps) {
 
     const handleShareClick = () => {
         const baseUrl = `${window.location.origin}${spaceRoute.show(space.slug).url}`;
-        const sessionId = crypto.randomUUID();
-        setShareUrl(`${baseUrl}?session_id=${sessionId}`);
+        const visitorId = crypto.randomUUID();
+        setShareUrl(`${baseUrl}?vid=${visitorId}`);
         setOpenSharedModal(true);
     };
 
@@ -92,15 +92,6 @@ export function SpaceCard({ space, onDelete }: SpaceCardProps) {
 
             <CardFooter className="z-10 flex items-center justify-between border-t bg-muted/30 p-4">
                 <div className="flex items-center gap-2.5">
-                    {/* <Avatar className="h-6 w-6 border">
-                        <AvatarImage
-                            src={`https://ui-avatars.com/api/?name=${space.owner.first_name}+${space.owner.last_name}&background=random`}
-                        />
-                        <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-xs font-medium text-muted-foreground">
-                        {space.owner.first_name} {space.owner.last_name}
-                    </span> */}
                     <UserInfo user={space.owner} />
                 </div>
 
