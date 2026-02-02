@@ -55,33 +55,29 @@ export default function SpaceEdit({ space }: Props) {
 
             <div className="mx-auto flex h-full w-full max-w-2xl flex-col gap-4 p-4">
                 <h1 className="text-2xl font-bold">Edit Space</h1>
+                <p className="text-sm text-muted-foreground">
+                    Update the details of this space. Changes are saved
+                    immediately after you submit.
+                </p>
 
                 <form onSubmit={submit} className="space-y-6">
+                    {/* Space Name */}
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">Space name</Label>
                         <Input
                             id="name"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             required
                         />
+                        <p className="text-sm text-muted-foreground">
+                            This name is shown to everyone who has access to the
+                            space.
+                        </p>
                         <InputError message={errors.name} />
                     </div>
 
-                    {/* <div className="space-y-2">
-                        <Label htmlFor="slug">Slug (URL)</Label>
-                        <Input
-                            id="slug"
-                            value={data.slug}
-                            onChange={(e) => setData('slug', e.target.value)}
-                            required
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Changing the slug will change the URL of the space.
-                        </p>
-                        <InputError message={errors.slug} />
-                    </div> */}
-
+                    {/* Space Description */}
                     <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>
                         <Textarea
@@ -91,10 +87,39 @@ export default function SpaceEdit({ space }: Props) {
                                 setData('description', e.target.value)
                             }
                         />
+                        <p className="text-sm text-muted-foreground">
+                            Update the description if the purpose of this space
+                            has changed.
+                        </p>
                         <InputError message={errors.description} />
                     </div>
 
-                    {/* <div className="flex items-center space-x-2">
+                    {/* Slug (URL) – intentionally hidden */}
+                    {/*
+                    <div className="space-y-2">
+                        <Label htmlFor="slug">Space URL</Label>
+                        <Input
+                            id="slug"
+                            value={data.slug}
+                            onChange={(e) => setData('slug', e.target.value)}
+                            required
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Changing the URL may break shared links.
+                        </p>
+                        <InputError message={errors.slug} />
+                    </div>
+                    */}
+
+                    {/* Private Space – future */}
+                    {/*
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div>
+                            <Label htmlFor="is_private">Private space</Label>
+                            <p className="text-sm text-muted-foreground">
+                                Only invited members will be able to access this space.
+                            </p>
+                        </div>
                         <Switch
                             id="is_private"
                             checked={data.is_private}
@@ -102,11 +127,15 @@ export default function SpaceEdit({ space }: Props) {
                                 setData('is_private', checked)
                             }
                         />
-                        <Label htmlFor="is_private">Private Space</Label>
-                    </div> */}
+                    </div>
+                    */}
 
-                    <Button type="submit" disabled={processing}>
-                        {processing ? 'Saving...' : 'Save Changes'}
+                    <Button
+                        type="submit"
+                        disabled={processing}
+                        className="w-full"
+                    >
+                        {processing ? 'Saving changes…' : 'Save changes'}
                     </Button>
                 </form>
             </div>

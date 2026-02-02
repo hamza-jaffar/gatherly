@@ -38,32 +38,58 @@ export default function SpaceCreate() {
 
             <div className="mx-auto flex h-full w-full max-w-2xl flex-col gap-4 p-4">
                 <h1 className="text-2xl font-bold">Create New Space</h1>
+                <p className="text-sm text-muted-foreground">
+                    A space is a shared place where you and others can manage
+                    tasks, notes, and conversations.
+                </p>
 
                 <form onSubmit={submit} className="space-y-6">
+                    {/* Space Name */}
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">Space name</Label>
                         <Input
                             id="name"
+                            placeholder="e.g. Product Planning, Family Tasks"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             required
                         />
+                        <p className="text-sm text-muted-foreground">
+                            Choose a clear name so people know what this space
+                            is for.
+                        </p>
                         <InputError message={errors.name} />
                     </div>
 
+                    {/* Space Description */}
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">
+                            Description (optional)
+                        </Label>
                         <Textarea
                             id="description"
+                            placeholder="What will you use this space for?"
                             value={data.description}
                             onChange={(e) =>
                                 setData('description', e.target.value)
                             }
                         />
+                        <p className="text-sm text-muted-foreground">
+                            A short description helps others understand the
+                            purpose of this space.
+                        </p>
                         <InputError message={errors.description} />
                     </div>
-                    {/* 
-                    <div className="flex items-center space-x-2">
+
+                    {/* Private Space Toggle (optional / future) */}
+                    {/*
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                        <div>
+                            <Label htmlFor="is_private">Private space</Label>
+                            <p className="text-sm text-muted-foreground">
+                                Only people you invite will be able to see and access this space.
+                            </p>
+                        </div>
                         <Switch
                             id="is_private"
                             checked={data.is_private}
@@ -71,14 +97,15 @@ export default function SpaceCreate() {
                                 setData('is_private', checked)
                             }
                         />
-                        <Label htmlFor="is_private">Private Space</Label>
-                    </div> */}
-                    <p className="text-sm text-muted-foreground">
-                        Private spaces are only visible to members you invite.
-                    </p>
+                    </div>
+                    */}
 
-                    <Button type="submit" disabled={processing}>
-                        {processing ? 'Creating...' : 'Create Space'}
+                    <Button
+                        type="submit"
+                        disabled={processing}
+                        className="w-full"
+                    >
+                        {processing ? 'Creating space…' : 'Create space'}
                     </Button>
                 </form>
             </div>
