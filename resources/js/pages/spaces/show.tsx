@@ -1,7 +1,7 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, SharedData } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Edit } from 'lucide-react';
 import spaceRoute from '@/routes/space';
@@ -54,7 +54,7 @@ export default function SpaceShow({ space }: Props) {
                             </Badge>
                         </div>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            URL: /spaces/{space.slug}
+                            URL: {spaceRoute.show(space.slug).url}
                         </p>
                     </div>
                     <Link href={spaceRoute.edit(space.slug).url}>
