@@ -8,7 +8,16 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, Copy, Facebook, Linkedin, Mail, Twitter } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import {
+    Check,
+    Copy,
+    Facebook,
+    Linkedin,
+    Mail,
+    MessageCircle,
+    Twitter,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface SharedModalProps {
@@ -39,22 +48,7 @@ export default function SharedModal({
     const shareLinks = [
         {
             name: 'WhatsApp',
-            icon: (
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-message-circle h-5 w-5"
-                >
-                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-                </svg>
-            ), // Let's use a clear SVG or a generic Share icon if needed, but here I'll try to provide a good "WhatsApp" style button or just generic structure.
+            icon: <MessageCircle className="h-5 w-5" />,
             href: `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`,
             color: 'bg-[#25D366] hover:bg-[#25D366]/90',
         },
@@ -80,7 +74,7 @@ export default function SharedModal({
             name: 'Email',
             icon: <Mail className="h-5 w-5" />,
             href: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`,
-            color: 'bg-gray-600 hover:bg-gray-600/90',
+            color: 'bg-muted-foreground hover:bg-muted-foreground/90',
         },
     ];
 
@@ -90,53 +84,62 @@ export default function SharedModal({
                 <DialogHeader>
                     <DialogTitle>Share Space</DialogTitle>
                     <DialogDescription>
-                        Share "{title}" with your team or friends.
+                        Anyone with the link can view this space.
                     </DialogDescription>
                 </DialogHeader>
 
-                {/* Social Grid */}
-                <div className="grid grid-cols-2 gap-3 py-4 sm:grid-cols-3">
-                    {shareLinks.map((link) => (
-                        <a
-                            key={link.name}
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`flex flex-col items-center justify-center gap-2 rounded-lg p-3 text-white transition-all ${link.color}`}
-                        >
-                            {link.icon}
-                            <span className="text-xs font-medium">
-                                {link.name}
-                            </span>
-                        </a>
-                    ))}
-                </div>
-
-                <div className="flex items-center space-x-2">
-                    <div className="grid flex-1 gap-2">
-                        <Label htmlFor="link" className="sr-only">
-                            Link
-                        </Label>
-                        <Input
-                            id="link"
-                            defaultValue={url}
-                            readOnly
-                            className="h-9"
-                        />
+                <div className="flex flex-col gap-4 py-4">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        {shareLinks.map((link) => (
+                            <a
+                                key={link.name}
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`flex flex-col items-center justify-center gap-2 rounded-lg p-3 text-white transition-all hover:scale-105 ${link.color}`}
+                            >
+                                {link.icon}
+                                <span className="text-xs font-medium">
+                                    {link.name}
+                                </span>
+                            </a>
+                        ))}
                     </div>
-                    <Button
-                        type="submit"
-                        size="sm"
-                        className="px-3"
-                        onClick={handleCopy}
-                    >
-                        <span className="sr-only">Copy</span>
-                        {copied ? (
-                            <Check className="h-4 w-4" />
-                        ) : (
-                            <Copy className="h-4 w-4" />
-                        )}
-                    </Button>
+
+                    <div className="flex items-center gap-2">
+                        <Separator className="flex-1" />
+                        <span className="text-xs text-muted-foreground uppercase">
+                            Or copy link
+                        </span>
+                        <Separator className="flex-1" />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <div className="grid flex-1 gap-2">
+                            <Label htmlFor="link" className="sr-only">
+                                Link
+                            </Label>
+                            <Input
+                                id="link"
+                                value={url}
+                                readOnly
+                                className="h-9 bg-muted/50"
+                            />
+                        </div>
+                        <Button
+                            type="submit"
+                            size="sm"
+                            className="px-3"
+                            onClick={handleCopy}
+                        >
+                            <span className="sr-only">Copy</span>
+                            {copied ? (
+                                <Check className="h-4 w-4" />
+                            ) : (
+                                <Copy className="h-4 w-4" />
+                            )}
+                        </Button>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

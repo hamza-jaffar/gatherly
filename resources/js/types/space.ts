@@ -1,5 +1,11 @@
 import { User } from './auth';
 
+export interface SpaceVisit {
+    id: number;
+    visit_count: number;
+    last_seen_at: string;
+}
+
 export interface Space {
     id: number;
     name: string;
@@ -10,4 +16,5 @@ export interface Space {
     owner: User;
     members_count?: number;
     last_activity_at?: string;
+    visits?: SpaceVisit[];
 }
