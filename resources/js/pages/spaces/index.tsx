@@ -1,15 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -20,30 +11,15 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-    BreadcrumbItem,
-    Pagination as PaginationType,
-    SharedData,
-} from '@/types';
-import { Edit, Eye, Plus, Trash } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
-import { Badge } from '@/components/ui/badge';
+import { BreadcrumbItem, Pagination as PaginationType } from '@/types';
+import { Plus } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import spaceRoute from '@/routes/space';
-
-interface Space {
-    id: number;
-    name: string;
-    slug: string;
-    description: string;
-    is_private: boolean;
-    created_at: string;
-    owner: {
-        id: number;
-        first_name: string;
-        last_name: string;
-    };
-}
+import { SpaceCard } from '@/components/spaces/space-card';
+import { SpaceFilters } from '@/components/spaces/space-filters';
+import { SpaceGridSkeleton } from '@/components/spaces/space-grid-skeleton';
+import axios from 'axios';
+import { Space } from '@/types/space';
 
 interface Props {
     spaces: PaginationType<Space>;
@@ -61,29 +37,173 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function SpaceIndex({ spaces, filters }: Props) {
+export default function SpaceIndex({ spaces: initialSpaces, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
+    // Mapping sort_by+sort_dir to a simplified sort value for the UI (default: recent)
+    const [sort, setSort] = useState(() => {
+        if (filters.sort_by === 'created_at' && filters.sort_dir === 'desc')
+            return 'newest';
+        if (filters.sort_by === 'created_at' && filters.sort_dir === 'asc')
+            return 'oldest';
+        if (filters.sort_by === 'name' && filters.sort_dir === 'asc')
+            return 'alphabetical';
+        return 'recent'; // Default or other cases
+    });
+
     const [deleteSlug, setDeleteSlug] = useState<string | null>(null);
 
-    // Debounce search
+    // Infinite Scroll State
+    const [spaces, setSpaces] = useState<Space[]>(initialSpaces.data);
+    const [nextPageUrl, setNextPageUrl] = useState<string | null>(
+        initialSpaces.links.find((l) => l.label === 'Next &raquo;')?.url ||
+            null,
+    );
+    const [loadingMore, setLoadingMore] = useState(false);
+    const observerTarget = useRef<HTMLDivElement>(null);
+
+    // Reset spaces when initialSpaces changes (e.g. Filter applied)
+    useEffect(() => {
+        setSpaces(initialSpaces.data);
+        const nextLink = initialSpaces.links.find(
+            (l) => l.label === 'Next &raquo;',
+        );
+        setNextPageUrl(nextLink?.url || null);
+    }, [initialSpaces]);
+
+    // Debounce search and update Filters
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (search !== filters.search) {
+            // Check if search or sort actually changed from props to avoid redundant reload on mount
+            const currentSortBy = filters.sort_by;
+            const currentSortDir = filters.sort_dir;
+
+            // Map UI sort to backend params
+            let sortBy = 'updated_at';
+            let sortDir = 'desc';
+
+            if (sort === 'newest') {
+                sortBy = 'created_at';
+                sortDir = 'desc';
+            } else if (sort === 'oldest') {
+                sortBy = 'created_at';
+                sortDir = 'asc';
+            } else if (sort === 'alphabetical') {
+                sortBy = 'name';
+                sortDir = 'asc';
+            }
+            // 'recent' stays updated_at desc
+
+            if (
+                search !== filters.search ||
+                sortBy !== currentSortBy ||
+                sortDir !== currentSortDir
+            ) {
                 router.get(
                     spaceRoute.index().url,
-                    { search: search },
-                    { preserveState: true, replace: true },
+                    { search: search, sort_by: sortBy, sort_dir: sortDir },
+                    {
+                        preserveState: true,
+                        replace: true,
+                        preserveScroll: true,
+                    },
                 );
             }
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [search]);
+    }, [search, sort]);
+
+    // Infinite Scroll Implementation
+    const loadMore = useCallback(async () => {
+        if (!nextPageUrl || loadingMore) return;
+
+        setLoadingMore(true);
+        try {
+            // Force JSON response to ensure we get the data structure we want
+            const response = await axios.get(nextPageUrl, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            let newSpaces: Space[] = [];
+            let newNextUrl: string | null = null;
+
+            const resData = response.data;
+
+            if (resData.props && resData.props.spaces) {
+                // Inertia Page Object Response
+                const spacesData = resData.props.spaces;
+                newSpaces = spacesData.data || [];
+                newNextUrl = spacesData.next_page_url || null;
+
+                // Sometimes links are used instead of next_page_url top-level
+                if (!newNextUrl && spacesData.links) {
+                    const nextLink = spacesData.links.find(
+                        (l: any) =>
+                            l.label && l.label.includes('Next') && l.url,
+                    );
+                    newNextUrl = nextLink ? nextLink.url : null;
+                }
+            } else if (resData.data && Array.isArray(resData.data)) {
+                // Standard API Response (Laravel Resource)
+                newSpaces = resData.data;
+                newNextUrl =
+                    resData.next_page_url ||
+                    (resData.links?.next as string) ||
+                    null;
+            } else if (resData.spaces && resData.spaces.data) {
+                // Direct Props Wrapping (if returned directly)
+                newSpaces = resData.spaces.data;
+                newNextUrl = resData.spaces.next_page_url;
+            }
+
+            if (newSpaces.length > 0) {
+                setSpaces((prev) => {
+                    const existingIds = new Set(prev.map((s) => s.id));
+                    const uniqueNewSpaces = newSpaces.filter(
+                        (s) => !existingIds.has(s.id),
+                    );
+                    return [...prev, ...uniqueNewSpaces];
+                });
+                setNextPageUrl(newNextUrl);
+            } else {
+                setNextPageUrl(null); // No more data found
+            }
+        } catch (error) {
+            console.error('Failed to load more spaces', error);
+            // Optional: Show error toast here
+        } finally {
+            setLoadingMore(false);
+        }
+    }, [nextPageUrl, loadingMore]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    loadMore();
+                }
+            },
+            { threshold: 1.0 },
+        );
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
+
+        return () => observer.disconnect();
+    }, [loadMore]);
 
     const confirmDelete = () => {
         if (deleteSlug) {
             router.delete(spaceRoute.destroy(deleteSlug).url, {
                 onFinish: () => setDeleteSlug(null),
+                onSuccess: () => {
+                    // Remove from local state immediately for snappy feel
+                    setSpaces(spaces.filter((s) => s.slug !== deleteSlug));
+                },
             });
         }
     };
@@ -92,143 +212,87 @@ export default function SpaceIndex({ spaces, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Spaces" />
 
-            <div className="flex h-full flex-col gap-4 p-4">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Spaces</h1>
+            <div className="flex h-full w-full flex-col gap-6 p-6">
+                {/* Header Section */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                            Spaces
+                        </h1>
+                        <p className="text-muted-foreground">
+                            Manage your shared workspaces and collaborate with
+                            your team.
+                        </p>
+                    </div>
                     <Link href={spaceRoute.create().url}>
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" />
+                        <Button
+                            size="lg"
+                            className="w-full shadow-sm sm:w-auto"
+                        >
+                            <Plus className="mr-2 h-5 w-5" />
                             Create Space
                         </Button>
                     </Link>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                    <Input
-                        placeholder="Search spaces..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="max-w-sm"
-                    />
-                </div>
+                {/* Filters */}
+                <SpaceFilters
+                    search={search}
+                    onSearchChange={setSearch}
+                    sort={sort}
+                    onSortChange={setSort}
+                />
 
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Owner</TableHead>
-                                <TableHead>Created At</TableHead>
-                                <TableHead className="text-right">
-                                    Actions
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {spaces.data.length === 0 ? (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={5}
-                                        className="h-24 text-center"
-                                    >
-                                        No results.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                spaces.data.map((space) => (
-                                    <TableRow key={space.id}>
-                                        <TableCell className="font-medium">
-                                            {space.name}
-                                            {space.description && (
-                                                <p className="max-w-[200px] truncate text-xs text-muted-foreground">
-                                                    {space.description}
-                                                </p>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant={
-                                                    space.is_private
-                                                        ? 'secondary'
-                                                        : 'default'
-                                                }
-                                            >
-                                                {space.is_private
-                                                    ? 'Private'
-                                                    : 'Public'}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            {space.owner?.first_name}{' '}
-                                            {space.owner?.last_name}
-                                        </TableCell>
-                                        <TableCell>
-                                            {new Date(
-                                                space.created_at,
-                                            ).toLocaleDateString()}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Link
-                                                    href={
-                                                        spaceRoute.show(
-                                                            space.slug,
-                                                        ).url
-                                                    }
-                                                >
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                                <Link
-                                                    href={
-                                                        spaceRoute.edit(
-                                                            space.slug,
-                                                        ).url
-                                                    }
-                                                >
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                    >
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="text-destructive hover:text-destructive"
-                                                    onClick={() =>
-                                                        setDeleteSlug(
-                                                            space.slug,
-                                                        )
-                                                    }
-                                                >
-                                                    <Trash className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                {/* Grid Content */}
+                {spaces.length === 0 && !loadingMore ? (
+                    <div className="flex h-64 animate-in flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center duration-500 zoom-in-95 fade-in">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+                            <Plus className="h-10 w-10 text-muted-foreground" />
+                        </div>
+                        <h3 className="mt-4 text-lg font-semibold">
+                            No spaces found
+                        </h3>
+                        <p className="mb-4 max-w-sm text-muted-foreground">
+                            Get started by creating a new space or adjusting
+                            your search filters.
+                        </p>
+                        <Link href={spaceRoute.create().url}>
+                            <Button variant="outline">Create Space</Button>
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="grid animate-in grid-cols-1 gap-6 duration-700 fade-in sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {spaces.map((space) => (
+                            <SpaceCard
+                                key={space.id}
+                                space={space}
+                                onDelete={setDeleteSlug}
+                            />
+                        ))}
+                    </div>
+                )}
 
-                {/* Simple Pagination */}
-                <div className="flex items-center justify-end space-x-2 py-4">
-                    {spaces.links.map((link, i) => (
-                        <Link
-                            key={i}
-                            href={link.url || '#'}
-                            className={`rounded border px-3 py-1 ${link.active ? 'bg-primary text-primary-foreground' : ''} ${!link.url ? 'pointer-events-none opacity-50' : ''}`}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                        />
-                    ))}
+                {/* Infinite Scroll Sentinel / Loading State */}
+                <p className="text-center text-muted-foreground">
+                    You have {spaces.length} spaces
+                </p>
+                <div
+                    ref={observerTarget}
+                    className="flex w-full flex-col items-center justify-center"
+                >
+                    {loadingMore ? (
+                        <SpaceGridSkeleton />
+                    ) : (
+                        nextPageUrl && (
+                            <Button
+                                variant="ghost"
+                                onClick={loadMore}
+                                className="text-muted-foreground hover:text-foreground"
+                            >
+                                Load more spaces
+                            </Button>
+                        )
+                    )}
                 </div>
             </div>
 
