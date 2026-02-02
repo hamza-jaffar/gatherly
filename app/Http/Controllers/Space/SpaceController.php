@@ -7,6 +7,7 @@ use App\Http\Requests\StoreSpaceRequest;
 use App\Http\Requests\UpdateSpaceRequest;
 use App\Models\Space;
 use App\Services\SpaceService;
+use App\Services\SpaceVisitorService;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -59,14 +60,21 @@ class SpaceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Space $space)
+    public function show(Space $space, Request $request)
     {
+        try {
+            $space->load('owner', 'visits');
+            SpaceVisitorService::track($space, $request->vid);
 
-        $space->load('owner');
+            return Inertia::render('spaces/show', [
+                'space' => $space,
+            ]);
 
-        return Inertia::render('spaces/show', [
-            'space' => $space,
-        ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to track space visitor: '.$e->getMessage());
+
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**
