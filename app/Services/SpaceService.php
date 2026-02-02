@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\SlugHelper;
 use App\Models\ActivityLog;
 use App\Models\Space;
+use Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -27,8 +28,11 @@ class SpaceService
             $sortDir = 'desc';
         }
 
+        $user = Auth::user();
+
         return Space::query()
             ->with(['owner'])
+            ->where('created_by', $user->id)
             ->when($search, function (Builder $query) use ($search) {
                 $query->where(function (Builder $q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")

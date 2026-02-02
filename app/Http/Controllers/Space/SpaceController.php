@@ -19,6 +19,10 @@ class SpaceController extends Controller
     {
         $spaces = SpaceService::index($request->all());
 
+        if ($request->wantsJson()) {
+            return response()->json($spaces);
+        }
+
         return Inertia::render('spaces/index', [
             'spaces' => $spaces,
             'filters' => $request->only(['search', 'sort_by', 'sort_dir']),
