@@ -74,7 +74,7 @@ export default function ItemList({
     if (variant === 'summary') {
         return (
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-muted-foreground">
                         Recent items
                     </h3>
@@ -85,7 +85,7 @@ export default function ItemList({
                         View all
                         <ArrowRight className="h-3 w-3" />
                     </Link>
-                </div>
+                </div> */}
 
                 {items.length > 0 ? (
                     <div className="space-y-2">

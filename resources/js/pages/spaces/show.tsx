@@ -3,7 +3,17 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { BreadcrumbItem, SharedData } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Eye, Users, FileText, Copy, Check, Share2 } from 'lucide-react';
+import {
+    Edit,
+    Eye,
+    Users,
+    FileText,
+    Copy,
+    Check,
+    Share2,
+    ArrowLeft,
+    ArrowRight,
+} from 'lucide-react';
 import spaceRoute from '@/routes/space';
 import { Space } from '@/types/space';
 import { UserInfo } from '@/components/user-info';
@@ -60,7 +70,6 @@ export default function SpaceShow({ space, items, filters }: Props) {
             <Head title={space.name} />
 
             <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                {/* Header ... omitted for length, same as before ... */}
                 <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div className="flex items-center gap-3">
@@ -101,9 +110,7 @@ export default function SpaceShow({ space, items, filters }: Props) {
                     )}
                 </div>
 
-                {/* Content Grid */}
                 <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Main Content */}
                     <div className="space-y-6 lg:col-span-2">
                         <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
                             <div className="flex flex-col space-y-1.5 p-6 pb-2">
@@ -126,9 +133,10 @@ export default function SpaceShow({ space, items, filters }: Props) {
                                 </h2>
                                 <Link
                                     href={`/spaces/${space.slug}/items`}
-                                    className="text-sm font-medium text-primary hover:underline"
+                                    className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                                 >
-                                    View all items →
+                                    View all items
+                                    <ArrowRight className="h-3 w-3" />
                                 </Link>
                             </div>
                             <ItemList
@@ -138,8 +146,6 @@ export default function SpaceShow({ space, items, filters }: Props) {
                             />
                         </div>
                     </div>
-
-                    {/* Sidebar / Meta Info */}
                     <div className="space-y-6">
                         <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
                             <div className="flex flex-col space-y-1.5 p-6">
@@ -182,6 +188,45 @@ export default function SpaceShow({ space, items, filters }: Props) {
                                         </code>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+                            <div className="flex items-center justify-between space-y-1.5 px-4 py-6">
+                                <h3 className="leading-none font-semibold tracking-tight">
+                                    Space Members
+                                </h3>
+                                <Link
+                                    href={`/spaces/${space.slug}/members`}
+                                    className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                                >
+                                    View all members
+                                    <ArrowRight className="h-3 w-3" />
+                                </Link>
+                            </div>
+                            <div className="max-h-[290px] overflow-y-auto px-4 pb-6">
+                                {space.users && space.users.length > 0 ? (
+                                    <div className="space-y-3">
+                                        {space.users
+                                            .slice(0, 5)
+                                            .map((user: any) => (
+                                                <div
+                                                    key={user.id}
+                                                    className="flex items-center gap-2"
+                                                >
+                                                    <UserInfo
+                                                        user={user}
+                                                        showEmail
+                                                    />
+                                                </div>
+                                            ))}
+                                    </div>
+                                ) : (
+                                    <div className="rounded-lg border border-dashed p-6 text-center">
+                                        <p className="text-sm text-muted-foreground">
+                                            No members found
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

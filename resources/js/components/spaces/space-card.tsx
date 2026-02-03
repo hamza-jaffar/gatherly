@@ -76,7 +76,7 @@ export function SpaceCard({ space, onDelete }: SpaceCardProps) {
                         <div className="flex items-center gap-1.5 rounded-md bg-secondary/50 px-2.5 py-1">
                             <Users className="h-3.5 w-3.5" />
                             <span className="font-medium">
-                                {space.members_count || 1}
+                                {(space.users_count ?? 1) + 1}
                             </span>
                         </div>
                     </div>

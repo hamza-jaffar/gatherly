@@ -25,6 +25,8 @@ export type Pagination<T> = {
         to: number;
         total: number;
     };
+    next_page_url?: string | null;
+    prev_page_url?: string | null;
 };
 
 export type SharedData = {

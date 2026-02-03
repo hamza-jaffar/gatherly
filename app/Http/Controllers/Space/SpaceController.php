@@ -63,14 +63,14 @@ class SpaceController extends Controller
     public function show(Space $space, Request $request)
     {
         try {
-            $space->load('owner', 'visits');
+            $space->load('owner', 'visits', 'users');
             
             $items = \App\Models\Item::where('space_id', $space->id)
                 ->where(function ($query) {
                     $query->where('type', 'NOTE')
                           ->orWhere(function ($q) {
                               $q->where('type', 'TASK')
-                                ->where('status', '!=', 'DONE');
+                                 ->where('status', '!=', 'DONE');
                           });
                 })
                 ->latest()
