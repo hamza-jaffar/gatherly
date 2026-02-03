@@ -64,10 +64,24 @@ class SpaceController extends Controller
     {
         try {
             $space->load('owner', 'visits');
+            
+            $items = \App\Models\Item::where('space_id', $space->id)
+                ->where(function ($query) {
+                    $query->where('type', 'NOTE')
+                          ->orWhere(function ($q) {
+                              $q->where('type', 'TASK')
+                                ->where('status', '!=', 'DONE');
+                          });
+                })
+                ->latest()
+                ->limit(7)
+                ->get();
+            
             SpaceVisitorService::track($space, $request->vid);
 
             return Inertia::render('spaces/show', [
                 'space' => $space,
+                'items' => $items,
             ]);
 
         } catch (\Exception $e) {

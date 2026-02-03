@@ -10,12 +10,17 @@ import { UserInfo } from '@/components/user-info';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import SharedModal from '@/components/spaces/shared-modal';
+import ItemList from '@/components/items/item-list';
+import ItemCreateForm from '@/components/items/item-create-form';
+import { router } from '@inertiajs/react';
 
 interface Props {
     space: Space;
+    items: any[];
+    filters?: any;
 }
 
-export default function SpaceShow({ space }: Props) {
+export default function SpaceShow({ space, items, filters }: Props) {
     const { auth } = usePage<SharedData>().props;
     const [openSharedModal, setOpenSharedModal] = useState(false);
     const [shareUrl, setShareUrl] = useState<string>('');
@@ -55,7 +60,7 @@ export default function SpaceShow({ space }: Props) {
             <Head title={space.name} />
 
             <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                {/* Header */}
+                {/* Header ... omitted for length, same as before ... */}
                 <div className="mb-8 flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <div className="flex items-center gap-3">
@@ -101,7 +106,7 @@ export default function SpaceShow({ space }: Props) {
                     {/* Main Content */}
                     <div className="space-y-6 lg:col-span-2">
                         <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-                            <div className="flex flex-col space-y-1.5 p-6">
+                            <div className="flex flex-col space-y-1.5 p-6 pb-2">
                                 <h3 className="leading-none font-semibold tracking-tight">
                                     About this Space
                                 </h3>
@@ -112,6 +117,25 @@ export default function SpaceShow({ space }: Props) {
                                         'No description provided.'}
                                 </p>
                             </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold tracking-tight">
+                                    Recent Items
+                                </h2>
+                                <Link
+                                    href={`/spaces/${space.slug}/items`}
+                                    className="text-sm font-medium text-primary hover:underline"
+                                >
+                                    View all items →
+                                </Link>
+                            </div>
+                            <ItemList
+                                items={items}
+                                spaceSlug={space.slug}
+                                variant="summary"
+                            />
                         </div>
                     </div>
 
