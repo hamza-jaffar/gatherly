@@ -13,6 +13,7 @@ import {
     Share2,
     ArrowLeft,
     ArrowRight,
+    Plus,
 } from 'lucide-react';
 import spaceRoute from '@/routes/space';
 import { Space } from '@/types/space';
@@ -28,12 +29,19 @@ interface Props {
     space: Space;
     items: any[];
     filters?: any;
+    can: {
+        update: boolean;
+        delete: boolean;
+        manageMembers: boolean;
+        createItem: boolean;
+    };
 }
 
-export default function SpaceShow({ space, items, filters }: Props) {
+export default function SpaceShow({ space, items, filters, can }: Props) {
     const { auth } = usePage<SharedData>().props;
     const [openSharedModal, setOpenSharedModal] = useState(false);
     const [shareUrl, setShareUrl] = useState<string>('');
+    const [openCreateItemModal, setOpenCreateItemModal] = useState(false);
 
     const handleShareClick = () => {
         const baseUrl = `${window.location.origin}${spaceRoute.show(space.slug).url}`;
@@ -98,7 +106,7 @@ export default function SpaceShow({ space, items, filters }: Props) {
                             Total Visit: {totalVisits}
                         </p>
                     </div>
-                    {space.owner.id === auth.user?.id && (
+                    {can.update && (
                         <div className="flex gap-2">
                             <Link href={spaceRoute.edit(space.slug).url}>
                                 <Button variant="outline">

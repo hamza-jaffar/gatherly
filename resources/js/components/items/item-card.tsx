@@ -24,6 +24,10 @@ interface Item {
     status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | null;
     due_date: string | null;
     space_id: number;
+    can?: {
+        update: boolean;
+        delete: boolean;
+    };
 }
 
 interface ItemCardProps {
@@ -123,12 +127,14 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                     >
                         {item.title}
                     </h3>
-                    <button
-                        className="cursor-pointer text-red-500 hover:text-red-800"
-                        onClick={deleteItem}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </button>
+                    {item.can?.delete && (
+                        <button
+                            className="cursor-pointer text-red-500 hover:text-red-800"
+                            onClick={deleteItem}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </button>
+                    )}
                 </div>
 
                 <p
@@ -172,30 +178,42 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => updateStatus('TODO')}>
-                            Mark as Todo
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => updateStatus('IN_PROGRESS')}
-                        >
-                            Mark as In Progress
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => updateStatus('REVIEW')}
-                        >
-                            Mark as Review
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateStatus('DONE')}>
-                            Mark as Done
-                        </DropdownMenuItem>
-                        <div className="my-1 border-t" />
-                        <DropdownMenuItem
-                            onClick={deleteItem}
-                            className="text-destructive"
-                        >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                        </DropdownMenuItem>
+                        {item.can?.update && (
+                            <>
+                                <DropdownMenuItem
+                                    onClick={() => updateStatus('TODO')}
+                                >
+                                    Mark as Todo
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => updateStatus('IN_PROGRESS')}
+                                >
+                                    Mark as In Progress
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => updateStatus('REVIEW')}
+                                >
+                                    Mark as Review
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => updateStatus('DONE')}
+                                >
+                                    Mark as Done
+                                </DropdownMenuItem>
+                            </>
+                        )}
+                        {item.can?.delete && (
+                            <>
+                                <div className="my-1 border-t" />
+                                <DropdownMenuItem
+                                    onClick={deleteItem}
+                                    className="text-destructive"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

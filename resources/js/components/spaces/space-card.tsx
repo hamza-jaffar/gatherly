@@ -113,12 +113,15 @@ export function SpaceCard({ space, onDelete }: SpaceCardProps) {
                                     <Eye className="mr-2 h-4 w-4" /> View Space
                                 </DropdownMenuItem>
                             </Link>
-                            <Link href={spaceRoute.edit(space.slug).url}>
-                                <DropdownMenuItem>
-                                    <Pen className="mr-2 h-4 w-4" /> Edit Space
-                                </DropdownMenuItem>
-                            </Link>
-                            {onDelete && (
+                            {space.can?.update && (
+                                <Link href={spaceRoute.edit(space.slug).url}>
+                                    <DropdownMenuItem>
+                                        <Pen className="mr-2 h-4 w-4" /> Edit
+                                        Space
+                                    </DropdownMenuItem>
+                                </Link>
+                            )}
+                            {space.can?.delete && onDelete && (
                                 <>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem

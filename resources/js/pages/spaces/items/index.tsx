@@ -20,12 +20,16 @@ interface Props {
         prev_cursor: string | null;
     };
     filters?: any;
+    can: {
+        createItem: boolean;
+    };
 }
 
 export default function ItemsIndex({
     space,
     items: initialItems,
     filters,
+    can,
 }: Props) {
     const [openCreateItemModal, setOpenCreateItemModal] = useState(false);
 
@@ -95,6 +99,7 @@ export default function ItemsIndex({
                         hasMore={!!nextCursor}
                         onLoadMore={loadMore}
                         isLoadingMore={loadingMore}
+                        canCreate={can.createItem}
                     />
                 </div>
             </div>
