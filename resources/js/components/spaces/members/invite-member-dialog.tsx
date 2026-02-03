@@ -37,11 +37,10 @@ export function InviteMemberDialog({ spaceSlug }: InviteMemberDialogProps) {
         e.preventDefault();
         post(`/spaces/${spaceSlug}/members`, {
             onSuccess: () => {
-                toast.success('Invitation sent');
                 setOpen(false);
                 reset();
             },
-            onError: () => toast.error('Failed to invite member'),
+            onError: () => {},
         });
     };
 

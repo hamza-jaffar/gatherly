@@ -47,8 +47,8 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
             {
                 onStart: () => setIsUpdating(true),
                 onFinish: () => setIsUpdating(false),
-                onSuccess: () => toast.success('Status updated'),
-                onError: () => toast.error('Failed to update status'),
+                onSuccess: () => {},
+                onError: () => {},
                 preserveScroll: true,
             },
         );
@@ -58,8 +58,8 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
         if (!confirm('Are you sure you want to delete this item?')) return;
 
         router.delete(`/spaces/${spaceSlug}/items/${item.id}`, {
-            onSuccess: () => toast.success('Item deleted'),
-            onError: () => toast.error('Failed to delete item'),
+            onSuccess: () => {},
+            onError: () => {},
             preserveScroll: true,
         });
     };

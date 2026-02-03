@@ -44,11 +44,10 @@ export default function ItemCreateForm({
 
         post(`/spaces/${spaceSlug}/items`, {
             onSuccess: () => {
-                toast.success('Item created successfully');
                 onOpenChange(false);
                 reset();
             },
-            onError: () => toast.error('Failed to create item'),
+            onError: () => {},
         });
     };
 
