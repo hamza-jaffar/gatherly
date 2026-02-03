@@ -37,6 +37,7 @@ class Space extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'space_user')
+            ->withPivot('role', 'is_active', 'is_private')
             ->withTimestamps();
     }
 

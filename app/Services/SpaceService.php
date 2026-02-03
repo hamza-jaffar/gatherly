@@ -33,7 +33,13 @@ class SpaceService
 
         return Space::query()
             ->with(['owner'])
-            ->where('created_by', $user->id)
+            ->withCount('users')
+            ->where(function ($query) use ($user) {
+                $query->where('created_by', $user->id)
+                    ->orWhereHas('users', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
+            })
             ->when($search, function (Builder $query) use ($search) {
                 $query->where(function (Builder $q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")

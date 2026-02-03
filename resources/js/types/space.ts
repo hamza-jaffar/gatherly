@@ -13,8 +13,11 @@ export interface Space {
     description: string;
     is_private: boolean;
     created_at: string;
+    created_by: number;
     owner: User;
     members_count?: number;
+    users_count?: number;
     last_activity_at?: string;
+    users?: User[];
     visits?: SpaceVisit[];
 }
