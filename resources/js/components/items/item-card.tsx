@@ -89,7 +89,7 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                 className={`group relative cursor-pointer p-8 transition-all duration-500 ${color.bg} ${color.border} border-r border-b ${rotation} flex min-h-[220px] flex-col shadow-[10px_10px_30px_rgba(0,0,0,0.1)] hover:z-20 hover:-translate-y-2 hover:rotate-0 hover:shadow-[20px_20px_40px_rgba(0,0,0,0.15)]`}
             >
                 {/* Subtle Paper Texture Overlay */}
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.03]" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] bg-size-[16px_16px] opacity-[0.03]" />
 
                 {/* 3D Push-pin */}
                 <div className="absolute top-[-14px] left-1/2 z-30 -translate-x-1/2 transition-transform group-hover:scale-110">
