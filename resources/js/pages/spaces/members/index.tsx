@@ -29,12 +29,16 @@ interface Props {
     filters: {
         search?: string;
     };
+    can: {
+        manageMembers: boolean;
+    };
 }
 
 export default function SpaceMembersIndex({
     space,
     members: initialMembers,
     filters,
+    can,
 }: Props) {
     const { auth } = usePage<SharedData>().props;
     const [search, setSearch] = useState(filters.search || '');
@@ -100,9 +104,6 @@ export default function SpaceMembersIndex({
         { title: 'Members', href: `/spaces/${space.slug}/members` },
     ];
 
-    const currentUserIsOwner = auth.user?.id === space.created_by;
-    const currentUserIsAdmin = currentUserIsOwner; // For now, only owner is admin by default in this context
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Members - ${space.name}`} />
@@ -117,7 +118,7 @@ export default function SpaceMembersIndex({
                             Manage access and roles for your collaborators.
                         </p>
                     </div>
-                    {currentUserIsAdmin && (
+                    {can.manageMembers && (
                         <InviteMemberDialog spaceSlug={space.slug} />
                     )}
                 </div>
@@ -155,7 +156,7 @@ export default function SpaceMembersIndex({
                                     member={member}
                                     spaceSlug={space.slug}
                                     isOwner={false}
-                                    currentUserIsAdmin={currentUserIsAdmin}
+                                    currentUserIsAdmin={can.manageMembers}
                                 />
                             ))}
                         </div>

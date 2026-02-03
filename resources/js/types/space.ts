@@ -12,12 +12,19 @@ export interface Space {
     slug: string;
     description: string;
     is_private: boolean;
-    created_at: string;
-    created_by: number;
     owner: User;
+    created_at: string;
+    updated_at: string;
+    created_by: number;
     members_count?: number;
     users_count?: number;
     last_activity_at?: string;
     users?: User[];
     visits?: SpaceVisit[];
+    can?: {
+        update: boolean;
+        delete: boolean;
+        manageMembers: boolean;
+        createItem: boolean;
+    };
 }

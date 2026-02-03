@@ -28,6 +28,21 @@ class ItemService
         return $query->latest()->cursorPaginate(15);
     }
 
+    public static function getItems(string $space_id, $limit = 7)
+    {
+        return Item::where('space_id', $space_id)
+            ->where(function ($query) {
+                $query->where('type', 'NOTE')
+                    ->orWhere(function ($query) {
+                        $query->where('type', 'TASK')
+                            ->where('status', '!=', 'DONE');
+                    });
+            })
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
+
     /**
      * Create a new item.
      */

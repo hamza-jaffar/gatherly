@@ -28,6 +28,14 @@ class ItemController extends Controller
     {
         $items = $this->itemService->listItems($space, $request->only(['type', 'status']));
 
+        $items->getCollection()->transform(function ($item) use ($request) {
+            $item->can = [
+                'update' => $request->user()->can('update', $item),
+                'delete' => $request->user()->can('delete', $item),
+            ];
+            return $item;
+        });
+
         if ($request->wantsJson()) {
             return response()->json([
                 'items' => $items,
@@ -39,6 +47,9 @@ class ItemController extends Controller
             'space' => $space->load('owner'),
             'items' => $items,
             'filters' => $request->only(['type', 'status']),
+            'can' => [
+                'createItem' => $request->user()->can('create', [Item::class, $space]),
+            ],
         ]);
     }
 
@@ -47,6 +58,7 @@ class ItemController extends Controller
      */
     public function store(Space $space, StoreItemRequest $request)
     {
+        $this->authorize('create', [Item::class, $space]);
         $item = $this->itemService->createItem($space, $request->validated());
 
         Log::info("Item created: {$item->id} in space {$space->id} by user ".auth()->id());
@@ -63,6 +75,8 @@ class ItemController extends Controller
             abort(403);
         }
 
+        $this->authorize('update', $item);
+
         $this->itemService->updateItem($item, $request->validated());
 
         Log::info("Item updated: {$item->id} by user ".auth()->id());
@@ -78,6 +92,8 @@ class ItemController extends Controller
         if ($item->space_id !== $space->id) {
             abort(403);
         }
+
+        $this->authorize('delete', $item);
 
         $this->itemService->deleteItem($item);
 

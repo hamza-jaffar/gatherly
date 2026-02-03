@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSpaceRequest;
 use App\Http\Requests\UpdateSpaceRequest;
 use App\Models\Space;
+use App\Services\ItemService;
 use App\Services\SpaceService;
 use App\Services\SpaceVisitorService;
 use Auth;
@@ -21,6 +22,15 @@ class SpaceController extends Controller
     public function index(Request $request)
     {
         $spaces = SpaceService::index($request->all());
+
+        $spaces->getCollection()->transform(function ($space) use ($request) {
+            $space->can = [
+                'update' => $request->user()->can('update', $space),
+                'delete' => $request->user()->can('delete', $space),
+            ];
+
+            return $space;
+        });
 
         if ($request->wantsJson()) {
             return response()->json($spaces);
@@ -64,24 +74,29 @@ class SpaceController extends Controller
     {
         try {
             $space->load('owner', 'visits', 'users');
-            
-            $items = \App\Models\Item::where('space_id', $space->id)
-                ->where(function ($query) {
-                    $query->where('type', 'NOTE')
-                          ->orWhere(function ($q) {
-                              $q->where('type', 'TASK')
-                                 ->where('status', '!=', 'DONE');
-                          });
-                })
-                ->latest()
-                ->limit(7)
-                ->get();
-            
+
+            $items = ItemService::getItems($space->id, 5);
+
+            $items->transform(function ($item) use ($request) {
+                $item->can = [
+                    'update' => $request->user()->can('update', $item),
+                    'delete' => $request->user()->can('delete', $item),
+                ];
+
+                return $item;
+            });
+
             SpaceVisitorService::track($space, $request->vid);
 
             return Inertia::render('spaces/show', [
                 'space' => $space,
                 'items' => $items,
+                'can' => [
+                    'update' => $request->user()->can('update', $space),
+                    'delete' => $request->user()->can('delete', $space),
+                    'manageMembers' => $request->user()->can('manageMembers', $space),
+                    'createItem' => $request->user()->can('create', [\App\Models\Item::class, $space]),
+                ],
             ]);
 
         } catch (\Exception $e) {
@@ -106,6 +121,7 @@ class SpaceController extends Controller
      */
     public function update(UpdateSpaceRequest $request, Space $space)
     {
+        $this->authorize('update', $space);
         try {
 
             $user = Auth::user();
@@ -126,6 +142,7 @@ class SpaceController extends Controller
      */
     public function destroy(Space $space)
     {
+        $this->authorize('delete', $space);
         try {
 
             $user = Auth::user();

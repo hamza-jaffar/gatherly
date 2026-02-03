@@ -20,6 +20,10 @@ interface Item {
     status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | null;
     due_date: string | null;
     space_id: number;
+    can?: {
+        update: boolean;
+        delete: boolean;
+    };
 }
 
 interface ItemListProps {
@@ -34,6 +38,7 @@ interface ItemListProps {
     hasMore?: boolean;
     onLoadMore?: () => void;
     isLoadingMore?: boolean;
+    canCreate?: boolean;
 }
 
 export default function ItemList({
@@ -45,6 +50,7 @@ export default function ItemList({
     hasMore,
     onLoadMore,
     isLoadingMore,
+    canCreate = true,
 }: ItemListProps) {
     const { auth } = usePage<SharedData>().props;
     const observerTarget = useRef<HTMLDivElement>(null);
@@ -148,7 +154,7 @@ export default function ItemList({
                     </p>
                 </div>
 
-                {auth.user && onAddItemClick && (
+                {auth.user && onAddItemClick && canCreate && (
                     <Button
                         onClick={onAddItemClick}
                         size="sm"
@@ -246,7 +252,7 @@ export default function ItemList({
                         Start by creating a task or a note for this space.
                     </p>
 
-                    {onAddItemClick && (
+                    {onAddItemClick && canCreate && (
                         <Button
                             onClick={onAddItemClick}
                             variant="outline"
