@@ -12,6 +12,7 @@ import { MoreHorizontal, Shield, UserMinus, UserCheck } from 'lucide-react';
 import { MemberRoleBadge } from './member-role-badge';
 import { router } from '@inertiajs/react';
 import { toast } from 'sonner';
+import { mergeNames } from '@/lib/utils';
 
 interface Member {
     id: number;
@@ -43,7 +44,7 @@ export function MemberCard({
             `/spaces/${spaceSlug}/members/${member.id}`,
             { role },
             {
-                onSuccess: () => toast.success('Role updated'),
+                onSuccess: () => {},
                 preserveScroll: true,
             },
         );
@@ -56,22 +57,23 @@ export function MemberCard({
             )
         ) {
             router.delete(`/spaces/${spaceSlug}/members/${member.id}`, {
-                onSuccess: () => toast.success('Member removed'),
+                onSuccess: () => {},
                 preserveScroll: true,
             });
         }
     };
 
     const name = `${member.first_name} ${member.last_name}`;
-    const initials = `${member.first_name[0]}${member.last_name[0]}`;
 
     return (
         <div className="flex items-center justify-between rounded-lg border bg-card p-4 transition-all hover:bg-muted/50">
             <div className="flex items-center gap-4">
                 <Avatar className="h-10 w-10 border shadow-sm">
-                    <AvatarImage src={member.avatar || undefined} />
+                    <AvatarImage
+                        src={`/storage/${member.avatar}` || undefined}
+                    />
                     <AvatarFallback className="bg-primary/5 text-xs font-bold text-primary">
-                        {initials}
+                        {mergeNames(member.first_name, member.last_name)}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
