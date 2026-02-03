@@ -23,7 +23,6 @@ interface Props {
 export default function SpaceShow({ space, items, filters }: Props) {
     const { auth } = usePage<SharedData>().props;
     const [openSharedModal, setOpenSharedModal] = useState(false);
-    const [openCreateItemModal, setOpenCreateItemModal] = useState(false);
     const [shareUrl, setShareUrl] = useState<string>('');
 
     // ... handleShareClick, copyUrl, etc. stay same recursively
@@ -122,16 +121,21 @@ export default function SpaceShow({ space, items, filters }: Props) {
                         </div>
 
                         <div className="space-y-4">
-                            <h2 className="text-2xl font-bold tracking-tight">
-                                Items
-                            </h2>
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold tracking-tight">
+                                    Recent Items
+                                </h2>
+                                <Link
+                                    href={`/spaces/${space.slug}/items`}
+                                    className="text-sm font-medium text-primary hover:underline"
+                                >
+                                    View all items →
+                                </Link>
+                            </div>
                             <ItemList
                                 items={items}
                                 spaceSlug={space.slug}
-                                filters={filters}
-                                onAddItemClick={() =>
-                                    setOpenCreateItemModal(true)
-                                }
+                                variant="summary"
                             />
                         </div>
                     </div>
@@ -192,11 +196,6 @@ export default function SpaceShow({ space, items, filters }: Props) {
                     title={space.name}
                 />
             )}
-            <ItemCreateForm
-                open={openCreateItemModal}
-                onOpenChange={setOpenCreateItemModal}
-                spaceSlug={space.slug}
-            />
         </AppLayout>
     );
 }

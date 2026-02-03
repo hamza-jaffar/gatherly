@@ -8,7 +8,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Plus, Filter } from 'lucide-react';
-import { router } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 
 interface Item {
     id: number;
@@ -23,11 +23,12 @@ interface Item {
 interface ItemListProps {
     items: Item[];
     spaceSlug: string;
-    onAddItemClick: () => void;
+    onAddItemClick?: () => void;
     filters?: {
         type?: string;
         status?: string;
     };
+    variant?: 'summary' | 'full';
 }
 
 export default function ItemList({
@@ -35,7 +36,47 @@ export default function ItemList({
     spaceSlug,
     onAddItemClick,
     filters,
+    variant = 'full',
 }: ItemListProps) {
+    if (variant === 'summary') {
+        return (
+            <div className="space-y-4">
+                {items.length > 0 ? (
+                    <div className="space-y-3">
+                        {items.map((item) => (
+                            <div
+                                key={item.id}
+                                className="flex items-center justify-between rounded-lg border bg-card p-3 shadow-sm"
+                            >
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-medium">
+                                        {item.title}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                        {item.type}{' '}
+                                        {item.status ? `• ${item.status}` : ''}
+                                    </span>
+                                </div>
+                                <Link
+                                    href={`/spaces/${spaceSlug}/items`}
+                                    className="text-xs text-primary hover:underline"
+                                >
+                                    Details
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center">
+                        <p className="text-sm text-muted-foreground">
+                            No active items
+                        </p>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     const filterType = filters?.type || 'ALL';
     const filterStatus = filters?.status || 'ALL';
 
@@ -43,7 +84,6 @@ export default function ItemList({
         const newFilters = { ...filters, [key]: value };
         if (value === 'ALL') delete newFilters[key as keyof typeof newFilters];
 
-        // Reset status if type changes to ALL or NOTE
         if (key === 'type' && (value === 'ALL' || value === 'NOTE')) {
             delete newFilters.status;
         }
@@ -58,7 +98,7 @@ export default function ItemList({
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                {/* <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <Filter className="h-4 w-4" />
                         <span>Filter by:</span>
@@ -98,16 +138,18 @@ export default function ItemList({
                             </SelectContent>
                         </Select>
                     )}
-                </div> */}
+                </div>
 
-                <Button
-                    onClick={onAddItemClick}
-                    size="sm"
-                    className="ml-auto h-8 gap-1"
-                >
-                    <Plus className="h-4 w-4" />
-                    New Item
-                </Button>
+                {onAddItemClick && (
+                    <Button
+                        onClick={onAddItemClick}
+                        size="sm"
+                        className="h-8 gap-1"
+                    >
+                        <Plus className="h-4 w-4" />
+                        New Item
+                    </Button>
+                )}
             </div>
 
             {items.length > 0 ? (
@@ -130,9 +172,11 @@ export default function ItemList({
                         Create your first task or note to get started in this
                         space.
                     </p>
-                    <Button onClick={onAddItemClick} variant="outline">
-                        Create your first item
-                    </Button>
+                    {onAddItemClick && (
+                        <Button onClick={onAddItemClick} variant="outline">
+                            Create your first item
+                        </Button>
+                    )}
                 </div>
             )}
         </div>

@@ -27,8 +27,8 @@ class ItemController extends Controller
 
         $items = $query->latest()->get();
 
-        return Inertia::render('spaces/show', [
-            'space' => $space->load('owner', 'visits'),
+        return Inertia::render('spaces/items/index', [
+            'space' => $space->load('owner'),
             'items' => $items,
             'filters' => $request->only(['type', 'status']),
         ]);
