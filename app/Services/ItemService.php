@@ -25,7 +25,7 @@ class ItemService
             $query->where('status', $filters['status']);
         }
 
-        return $query->latest()->cursorPaginate(5);
+        return $query->latest()->cursorPaginate(15);
     }
 
     /**

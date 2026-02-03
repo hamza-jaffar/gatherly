@@ -45,3 +45,10 @@ export const STICKY_NOTE_COLORS = [
         text: 'text-rose-900',
     },
 ];
+
+export const STATUS_CONFIG = {
+    TODO: { color: 'bg-slate-200 text-slate-700', label: 'Todo' },
+    IN_PROGRESS: { color: 'bg-blue-100 text-blue-700', label: 'In Progress' },
+    REVIEW: { color: 'bg-amber-100 text-amber-700', label: 'Review' },
+    DONE: { color: 'bg-emerald-100 text-emerald-700', label: 'Done' },
+};

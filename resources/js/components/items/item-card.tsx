@@ -11,7 +11,10 @@ import { format } from 'date-fns';
 import { router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
-import { STICKY_NOTE_COLORS } from '../../../contants/item-colors';
+import {
+    STATUS_CONFIG,
+    STICKY_NOTE_COLORS,
+} from '../../../contants/item-colors';
 
 interface Item {
     id: number;
@@ -27,13 +30,6 @@ interface ItemCardProps {
     item: Item;
     spaceSlug: string;
 }
-
-const statusConfig = {
-    TODO: { color: 'bg-slate-200 text-slate-700', label: 'Todo' },
-    IN_PROGRESS: { color: 'bg-blue-100 text-blue-700', label: 'In Progress' },
-    REVIEW: { color: 'bg-amber-100 text-amber-700', label: 'Review' },
-    DONE: { color: 'bg-emerald-100 text-emerald-700', label: 'Done' },
-};
 
 export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
@@ -128,7 +124,7 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                         {item.title}
                     </h3>
                     <button
-                        className="cursor-pointer hover:text-red-500"
+                        className="cursor-pointer text-red-500 hover:text-red-800"
                         onClick={deleteItem}
                     >
                         <Trash2 className="h-4 w-4" />
@@ -154,14 +150,14 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
     }
 
     return (
-        <div className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+        <div className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <div className="mb-3 flex items-start justify-between">
                 <div className="flex flex-wrap gap-2">
                     {item.status && (
                         <Badge
-                            className={`${statusConfig[item.status].color} border-none text-[10px] font-bold tracking-wider uppercase`}
+                            className={`${STATUS_CONFIG[item.status].color} border-none text-[10px] font-bold tracking-wider uppercase`}
                         >
-                            {statusConfig[item.status].label}
+                            {STATUS_CONFIG[item.status].label}
                         </Badge>
                     )}
                 </div>
@@ -170,7 +166,7 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-slate-400 hover:text-slate-600"
+                            className="h-8 w-8 cursor-pointer text-slate-400 hover:text-slate-600"
                         >
                             <MoreVertical className="h-4 w-4" />
                         </Button>
