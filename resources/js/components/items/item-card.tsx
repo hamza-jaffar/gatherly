@@ -1,32 +1,17 @@
 import { Badge } from '@/components/ui/badge';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import {
-    MoreVertical,
-    Calendar,
-    CheckCircle2,
-    Circle,
-    Clock,
-    Loader2,
-    Trash2,
-} from 'lucide-react';
+import { MoreVertical, Calendar, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
+import { STICKY_NOTE_COLORS } from '../../../contants/item-colors';
 
 interface Item {
     id: number;
@@ -44,10 +29,10 @@ interface ItemCardProps {
 }
 
 const statusConfig = {
-    TODO: { color: 'bg-slate-500', icon: Circle, label: 'Todo' },
-    IN_PROGRESS: { color: 'bg-blue-500', icon: Clock, label: 'In Progress' },
-    REVIEW: { color: 'bg-yellow-500', icon: Loader2, label: 'Review' },
-    DONE: { color: 'bg-green-500', icon: CheckCircle2, label: 'Done' },
+    TODO: { color: 'bg-slate-200 text-slate-700', label: 'Todo' },
+    IN_PROGRESS: { color: 'bg-blue-100 text-blue-700', label: 'In Progress' },
+    REVIEW: { color: 'bg-amber-100 text-amber-700', label: 'Review' },
+    DONE: { color: 'bg-emerald-100 text-emerald-700', label: 'Done' },
 };
 
 export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
@@ -79,95 +64,161 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
         });
     };
 
-    const StatusIcon = item.status ? statusConfig[item.status].icon : null;
+    const isNote = item.type === 'NOTE';
+
+    // Deterministic styles based on ID
+    const { color, rotation } = useMemo(() => {
+        const colorIdx = item.id % STICKY_NOTE_COLORS.length;
+        const rotations = [
+            'rotate-1',
+            '-rotate-1',
+            'rotate-2',
+            '-rotate-2',
+            'rotate-0',
+        ];
+        const rotClass = rotations[item.id % rotations.length];
+        return {
+            color: STICKY_NOTE_COLORS[colorIdx],
+            rotation: rotClass,
+        };
+    }, [item.id]);
+
+    if (isNote) {
+        return (
+            <div
+                className={`group relative mb-8 cursor-pointer break-inside-avoid p-8 transition-all duration-500 ${color.bg} ${color.border} border-r border-b ${rotation} flex min-h-[220px] flex-col shadow-[10px_10px_30px_rgba(0,0,0,0.1)] hover:z-20 hover:-translate-y-2 hover:rotate-0 hover:shadow-[20px_20px_40px_rgba(0,0,0,0.15)]`}
+            >
+                {/* Subtle Paper Texture Overlay */}
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#000_1px,transparent_1px)] bg-size-[16px_16px] opacity-[0.03]" />
+
+                {/* 3D Push-pin */}
+                <div className="absolute top-[-10px] left-1/2 z-30 -translate-x-1/2 transition-transform group-hover:scale-110">
+                    {/* Pin Head */}
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.3),2px_4px_6px_rgba(0,0,0,0.2)]">
+                        <div className="-mt-1 -ml-1 h-2 w-2 rounded-full border border-white/10 bg-white/30" />
+                    </div>
+                    {/* Pin Spike Shadow */}
+                    <div className="mx-auto -mt-[2px] h-3 w-1 bg-black/20 blur-[1px]" />
+                </div>
+
+                {/* Realistic Folded Corner */}
+                <div className="pointer-events-none absolute right-0 bottom-0 z-10 h-12 w-12">
+                    {/* Dark triangle for the shadow underneath the fold */}
+                    <div
+                        className="absolute right-0 bottom-0 h-full w-full bg-black/15"
+                        style={{
+                            clipPath: 'polygon(100% 0, 100% 100%, 0 100%)',
+                        }}
+                    />
+                    {/* The folded part of the paper */}
+                    <div
+                        className="absolute right-0 bottom-0 h-full w-full bg-white/40 backdrop-blur-[2px]"
+                        style={{
+                            clipPath: 'polygon(0 100%, 100% 0, 0 0)',
+                            transform: 'rotate(180deg)',
+                            boxShadow: '-2px -2px 10px rgba(0,0,0,0.1)',
+                        }}
+                    />
+                </div>
+
+                <div className="relative z-10 mb-4 flex items-start justify-between">
+                    <h3
+                        className={`font-serif text-2xl leading-tight font-bold italic ${color.text}`}
+                    >
+                        {item.title}
+                    </h3>
+                    <button
+                        className="cursor-pointer hover:text-red-500"
+                        onClick={deleteItem}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </button>
+                </div>
+
+                <p
+                    className={`relative z-10 line-clamp-6 grow font-serif text-xl leading-relaxed italic ${color.text} opacity-90`}
+                >
+                    {item.description}
+                </p>
+
+                <div className="relative z-10 mt-6 flex items-center justify-between border-t border-black/10 pt-4">
+                    {/* Subtle paper texture hint */}
+                    <span
+                        className={`text-[11px] font-black tracking-widest uppercase opacity-30 ${color.text}`}
+                    >
+                        Note No. {item.id}
+                    </span>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <Card className="group relative overflow-hidden transition-all hover:shadow-md">
-            <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <Badge
-                                variant={
-                                    item.type === 'TASK'
-                                        ? 'default'
-                                        : 'secondary'
-                                }
-                                className="text-[10px] tracking-wider uppercase"
-                            >
-                                {item.type}
-                            </Badge>
-                            {item.type === 'TASK' && item.status && (
-                                <Badge
-                                    className={`${statusConfig[item.status].color} text-[10px] tracking-wider text-white uppercase`}
-                                >
-                                    {statusConfig[item.status].label}
-                                </Badge>
-                            )}
-                        </div>
-                        <CardTitle className="text-lg leading-tight font-bold decoration-primary/30 decoration-2 group-hover:underline">
-                            {item.title}
-                        </CardTitle>
-                    </div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                            >
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {item.type === 'TASK' && (
-                                <>
-                                    <DropdownMenuItem
-                                        onClick={() => updateStatus('TODO')}
-                                    >
-                                        Set to Todo
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            updateStatus('IN_PROGRESS')
-                                        }
-                                    >
-                                        Set to In Progress
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => updateStatus('REVIEW')}
-                                    >
-                                        Set to Review
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => updateStatus('DONE')}
-                                    >
-                                        Set to Done
-                                    </DropdownMenuItem>
-                                    <div className="my-1 border-t" />
-                                </>
-                            )}
-                            <DropdownMenuItem
-                                onClick={deleteItem}
-                                className="text-destructive"
-                            >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+        <div className="group relative mb-6 break-inside-avoid overflow-hidden rounded-xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div className="mb-3 flex items-start justify-between">
+                <div className="flex flex-wrap gap-2">
+                    {item.status && (
+                        <Badge
+                            className={`${statusConfig[item.status].color} border-none text-[10px] font-bold tracking-wider uppercase`}
+                        >
+                            {statusConfig[item.status].label}
+                        </Badge>
+                    )}
                 </div>
-            </CardHeader>
-            <CardContent>
-                <p className="line-clamp-3 text-sm whitespace-pre-wrap text-muted-foreground">
-                    {item.description || 'No description provided.'}
-                </p>
-            </CardContent>
-            <CardFooter className="pt-0">
-                <div className="flex w-full items-center justify-between text-xs text-muted-foreground">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-slate-400 hover:text-slate-600"
+                        >
+                            <MoreVertical className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => updateStatus('TODO')}>
+                            Mark as Todo
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => updateStatus('IN_PROGRESS')}
+                        >
+                            Mark as In Progress
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => updateStatus('REVIEW')}
+                        >
+                            Mark as Review
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => updateStatus('DONE')}>
+                            Mark as Done
+                        </DropdownMenuItem>
+                        <div className="my-1 border-t" />
+                        <DropdownMenuItem
+                            onClick={deleteItem}
+                            className="text-destructive"
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+
+            <div className="space-y-3">
+                <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-primary">
+                    {item.title}
+                </h3>
+
+                {item.description && (
+                    <p className="line-clamp-4 text-sm leading-relaxed text-slate-600">
+                        {item.description}
+                    </p>
+                )}
+
+                <div className="flex items-center justify-between border-t border-slate-50 pt-3">
                     {item.due_date ? (
-                        <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                            <Calendar className="h-3.5 w-3.5" />
                             <span>
                                 {format(new Date(item.due_date), 'MMM d, yyyy')}
                             </span>
@@ -175,9 +226,12 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                     ) : (
                         <div />
                     )}
-                    {isUpdating && <Loader2 className="h-3 w-3 animate-spin" />}
+
+                    {isUpdating && (
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    )}
                 </div>
-            </CardFooter>
-        </Card>
+            </div>
+        </div>
     );
 }

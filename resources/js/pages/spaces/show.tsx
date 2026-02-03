@@ -25,7 +25,6 @@ export default function SpaceShow({ space, items, filters }: Props) {
     const [openSharedModal, setOpenSharedModal] = useState(false);
     const [shareUrl, setShareUrl] = useState<string>('');
 
-    // ... handleShareClick, copyUrl, etc. stay same recursively
     const handleShareClick = () => {
         const baseUrl = `${window.location.origin}${spaceRoute.show(space.slug).url}`;
         const visitorId = crypto.randomUUID();

@@ -5,9 +5,11 @@ import ItemCreateForm from '@/components/items/item-create-form';
 import { Space } from '@/types/space';
 import { BreadcrumbItem } from '@/types';
 import spaceRoute from '@/routes/space';
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
+import itemRoute from '@/routes/item';
 
 interface Props {
     space: Space;
@@ -29,7 +31,7 @@ export default function ItemsIndex({ space, items, filters }: Props) {
         },
         {
             title: 'Items',
-            href: `/spaces/${space.slug}/items`,
+            href: itemRoute.index(space.slug).url,
         },
     ];
 
@@ -38,7 +40,7 @@ export default function ItemsIndex({ space, items, filters }: Props) {
             <Head title={`Items - ${space.name}`} />
 
             <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="mb-8 flex items-center justify-between border-b pb-6">
+                {/* <div className="mb-8 flex items-center justify-between border-b pb-6">
                     <div>
                         <Link
                             href={spaceRoute.show(space.slug).url}
@@ -54,7 +56,7 @@ export default function ItemsIndex({ space, items, filters }: Props) {
                             Manage all tasks and notes in this space.
                         </p>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="space-y-6">
                     <ItemList
