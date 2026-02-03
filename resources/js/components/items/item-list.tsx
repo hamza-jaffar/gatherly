@@ -7,9 +7,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Plus, Filter, ArrowRight } from 'lucide-react';
+import { Plus, Filter, ArrowRight, Loader2 } from 'lucide-react';
 import { router, Link, usePage } from '@inertiajs/react';
 import { SharedData } from '@/types';
+import { useEffect, useRef } from 'react';
 
 interface Item {
     id: number;
@@ -30,6 +31,9 @@ interface ItemListProps {
         status?: string;
     };
     variant?: 'summary' | 'full';
+    hasMore?: boolean;
+    onLoadMore?: () => void;
+    isLoadingMore?: boolean;
 }
 
 export default function ItemList({
@@ -38,8 +42,31 @@ export default function ItemList({
     onAddItemClick,
     filters,
     variant = 'full',
+    hasMore,
+    onLoadMore,
+    isLoadingMore,
 }: ItemListProps) {
     const { auth } = usePage<SharedData>().props;
+    const observerTarget = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!hasMore || variant === 'summary' || !onLoadMore) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !isLoadingMore) {
+                    onLoadMore();
+                }
+            },
+            { threshold: 0.1 },
+        );
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
+
+        return () => observer.disconnect();
+    }, [hasMore, isLoadingMore, onLoadMore, variant]);
 
     /* ----------------------------------
      * SUMMARY VARIANT (Space overview)
@@ -53,7 +80,7 @@ export default function ItemList({
                     </h3>
                     <Link
                         href={`/spaces/${spaceSlug}/items`}
-                        className="flex items-center gap-1 text-xs text-primary hover:underline"
+                        className="flex cursor-pointer items-center gap-1 text-xs text-primary hover:underline"
                     >
                         View all
                         <ArrowRight className="h-3 w-3" />
@@ -125,7 +152,7 @@ export default function ItemList({
                     <Button
                         onClick={onAddItemClick}
                         size="sm"
-                        className="h-8 gap-1"
+                        className="h-8 cursor-pointer gap-1"
                     >
                         <Plus className="h-4 w-4" />
                         New item
@@ -177,15 +204,41 @@ export default function ItemList({
 
             {/* Items */}
             {items.length > 0 ? (
-                <div className="columns-1 gap-4 sm:columns-2 lg:columns-3">
-                    {items.map((item) => (
-                        <ItemCard
-                            key={item.id}
-                            item={item}
-                            spaceSlug={spaceSlug}
-                        />
-                    ))}
-                </div>
+                <>
+                    <div className="columns-1 gap-6 pt-2 pb-8 sm:columns-2 lg:columns-3">
+                        {items.map((item) => (
+                            <div
+                                key={item.id}
+                                className="break-inside-avoid pt-6 pb-2"
+                            >
+                                <ItemCard item={item} spaceSlug={spaceSlug} />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Infinite Scroll Trigger */}
+                    <div
+                        ref={observerTarget}
+                        className="flex h-20 items-center justify-center"
+                    >
+                        {isLoadingMore ? (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span>Loading more items...</span>
+                            </div>
+                        ) : (
+                            hasMore && (
+                                <Button
+                                    variant="ghost"
+                                    onClick={onLoadMore}
+                                    className="cursor-pointer text-muted-foreground hover:text-foreground"
+                                >
+                                    Load more items
+                                </Button>
+                            )
+                        )}
+                    </div>
+                </>
             ) : (
                 <div className="flex flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center">
                     <h3 className="text-lg font-semibold">No items yet</h3>

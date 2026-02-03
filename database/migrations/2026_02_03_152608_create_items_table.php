@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->enum('type', ['TASK', 'NOTE'])->default('TASK');
             $table->string('title');
+            $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->enum('status', ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'])->nullable();
             $table->dateTime('due_date')->nullable();

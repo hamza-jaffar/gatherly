@@ -3,29 +3,37 @@
 namespace App\Http\Controllers\Item;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Item\StoreItemRequest;
+use App\Http\Requests\Item\UpdateItemRequest;
 use App\Models\Item;
 use App\Models\Space;
+use App\Services\ItemService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ItemController extends Controller
 {
+    protected $itemService;
+
+    public function __construct(ItemService $itemService)
+    {
+        $this->itemService = $itemService;
+    }
+
+    /**
+     * Display a listing of the items.
+     */
     public function index(Space $space, Request $request)
     {
-        // This could be used for a separate items page or for partial reloads
-        $query = Item::where('space_id', $space->id);
+        $items = $this->itemService->listItems($space, $request->only(['type', 'status']));
 
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'items' => $items,
+                'filters' => $request->only(['type', 'status']),
+            ]);
         }
-
-        if ($request->has('status') && $request->type === 'TASK') {
-            $query->where('status', $request->status);
-        }
-
-        $items = $query->latest()->get();
 
         return Inertia::render('spaces/items/index', [
             'space' => $space->load('owner'),
@@ -34,57 +42,46 @@ class ItemController extends Controller
         ]);
     }
 
-    public function store(Space $space, Request $request)
+    /**
+     * Store a newly created item in storage.
+     */
+    public function store(Space $space, StoreItemRequest $request)
     {
-        $validated = $request->validate([
-            'type' => 'required|in:TASK,NOTE',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required_if:type,TASK|in:TODO,IN_PROGRESS,REVIEW,DONE',
-            'due_date' => 'nullable|date',
-        ]);
+        $item = $this->itemService->createItem($space, $request->validated());
 
-        $item = Item::create([
-            ...$validated,
-            'space_id' => $space->id,
-            'created_by' => Auth::id(),
-            'status' => $request->type === 'TASK' ? ($request->status ?? 'TODO') : null,
-        ]);
-
-        Log::info("Item created: {$item->id} in space {$space->id} by user ".Auth::id());
+        Log::info("Item created: {$item->id} in space {$space->id} by user ".auth()->id());
 
         return back()->with('success', 'Item created successfully.');
     }
 
-    public function update(Space $space, Item $item, Request $request)
+    /**
+     * Update the specified item in storage.
+     */
+    public function update(Space $space, Item $item, UpdateItemRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'sometimes|required|in:TODO,IN_PROGRESS,REVIEW,DONE',
-            'due_date' => 'nullable|date',
-        ]);
-
         if ($item->space_id !== $space->id) {
             abort(403);
         }
 
-        $item->update($validated);
+        $this->itemService->updateItem($item, $request->validated());
 
-        Log::info("Item updated: {$item->id} by user ".Auth::id());
+        Log::info("Item updated: {$item->id} by user ".auth()->id());
 
         return back()->with('success', 'Item updated successfully.');
     }
 
+    /**
+     * Remove the specified item from storage.
+     */
     public function destroy(Space $space, Item $item)
     {
         if ($item->space_id !== $space->id) {
             abort(403);
         }
 
-        $item->delete();
+        $this->itemService->deleteItem($item);
 
-        Log::info("Item deleted: {$item->id} by user ".Auth::id());
+        Log::info("Item deleted: {$item->id} by user ".auth()->id());
 
         return back()->with('success', 'Item deleted successfully.');
     }

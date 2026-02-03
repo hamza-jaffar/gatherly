@@ -9,11 +9,17 @@ class Item extends Model
 {
     use SoftDeletes;
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     protected $fillable = [
         'space_id',
         'created_by',
         'type',
         'title',
+        'slug',
         'description',
         'status',
         'due_date',
