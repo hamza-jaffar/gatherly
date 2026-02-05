@@ -26,13 +26,11 @@ interface ItemCardProps {
 export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
 
-    console.log(item);
-
     const updateStatus = (newStatus: Item['status']) => {
         if (item.status === newStatus) return;
 
         router.put(
-            `/spaces/${spaceSlug}/items/${item.id}`,
+            `/spaces/${spaceSlug}/items/${item.slug}`,
             { status: newStatus },
             {
                 onStart: () => setIsUpdating(true),
@@ -47,7 +45,7 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
     const deleteItem = () => {
         if (!confirm('Are you sure you want to delete this item?')) return;
 
-        router.delete(`/spaces/${spaceSlug}/items/${item.id}`, {
+        router.delete(`/spaces/${spaceSlug}/items/${item.slug}`, {
             onSuccess: () => {},
             onError: () => {},
             preserveScroll: true,

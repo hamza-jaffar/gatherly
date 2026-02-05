@@ -36,6 +36,7 @@ export interface Item {
     type: 'TASK' | 'NOTE';
     status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | null;
     due_date: string | null;
+    slug: string;
     space_id: number;
     can?: {
         update: boolean;
