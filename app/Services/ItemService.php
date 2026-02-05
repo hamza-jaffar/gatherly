@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\Item;
 use App\Models\Space;
+use App\Models\ActivityLog;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ItemService
@@ -61,7 +63,21 @@ class ItemService
         // Generate unique slug
         $data['slug'] = $this->generateUniqueSlug($data['title']);
 
-        return Item::create($data);
+        return DB::transaction(function () use ($data) {
+            $item = Item::create($data);
+
+            ActivityLog::create([
+                'user_id' => Auth::id(),
+                'action' => 'created',
+                'resource_type' => 'item',
+                'resource_id' => $item->id,
+                'new_values' => $item->toArray(),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+
+            return $item;
+        });
     }
 
     /**
@@ -74,7 +90,26 @@ class ItemService
             $data['slug'] = $this->generateUniqueSlug($data['title']);
         }
 
-        return $item->update($data);
+        return DB::transaction(function () use ($item, $data) {
+            $oldValues = $item->toArray();
+
+            $updated = $item->update($data);
+
+            if ($updated) {
+                ActivityLog::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'updated',
+                    'resource_type' => 'item',
+                    'resource_id' => $item->id,
+                    'old_values' => $oldValues,
+                    'new_values' => $item->fresh()->toArray(),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            }
+
+            return $updated;
+        });
     }
 
     /**
@@ -82,7 +117,24 @@ class ItemService
      */
     public function deleteItem(Item $item): bool
     {
-        return $item->delete();
+        return DB::transaction(function () use ($item) {
+            $oldValues = $item->toArray();
+            $deleted = $item->delete();
+
+            if ($deleted) {
+                ActivityLog::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'deleted',
+                    'resource_type' => 'item',
+                    'resource_id' => $item->id,
+                    'old_values' => $oldValues,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ]);
+            }
+
+            return $deleted;
+        });
     }
 
     /**
