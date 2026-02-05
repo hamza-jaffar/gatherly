@@ -1,6 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
-import { Space } from '@/types/space';
+import { Member, Space } from '@/types/space';
 import { BreadcrumbItem, SharedData, Pagination } from '@/types';
 import spaceRoute from '@/routes/space';
 import { useState, useEffect, useCallback } from 'react';
@@ -10,18 +10,6 @@ import { Search, Users, ChevronLeft, Loader2 } from 'lucide-react';
 import { MemberCard } from '@/components/spaces/members/member-card';
 import { InviteMemberDialog } from '@/components/spaces/members/invite-member-dialog';
 import axios from 'axios';
-
-interface Member {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    avatar: string | null;
-    pivot: {
-        role: string;
-        joined_at: string;
-    };
-}
 
 interface Props {
     space: Space;

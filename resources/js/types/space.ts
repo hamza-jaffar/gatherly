@@ -44,3 +44,10 @@ export interface Item {
     };
     owner: User;
 }
+
+export interface Member extends User {
+    pivot: {
+        role: string;
+        joined_at: string;
+    };
+}

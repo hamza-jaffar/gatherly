@@ -4,22 +4,20 @@ namespace App\Services;
 
 use App\Models\Space;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class SpaceMemberService
 {
-    public static function listMembers(Space $space, array $filters = [])
+    public static function listMembers(Space $space, array $filters = [], bool $fetch_admin = false)
     {
         $search = $filters['search'] ?? null;
 
         return $space->users()
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
+            ->when($search, fn ($query) => $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            }))
+            ->when(! $fetch_admin, fn ($query) => $query->where('user_id', '!=', $space->created_by))
             ->latest('space_user.created_at')
             ->paginate(20);
     }

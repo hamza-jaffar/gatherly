@@ -182,7 +182,6 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                     <div className="flex items-center gap-2">
                         <UserInfo user={item.owner} />
                     </div>
-                    {/* Subtle paper texture hint */}
                     <span
                         className={`text-[11px] font-black tracking-widest uppercase opacity-30 ${color.text}`}
                     >
@@ -268,6 +267,9 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                 )}
 
                 <div className="flex items-center justify-between border-t border-slate-50 pt-3">
+                    <div className="flex items-center gap-2">
+                        <UserInfo user={item.owner} />
+                    </div>
                     {item.due_date ? (
                         <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
                             <Calendar className="h-3.5 w-3.5" />
