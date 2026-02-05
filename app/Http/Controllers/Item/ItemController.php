@@ -86,7 +86,7 @@ class ItemController extends Controller
         $item = $this->itemService->createItem($space, $request->validated());
 
         // Sync mentioned users to task_assignments
-        if ($request->has('mentioned_users') && !empty($request->mentioned_users)) {
+        if ($item->type === 'TASK' && $request->has('mentioned_users') && !empty($request->mentioned_users)) {
             TaskAssignmentService::syncAssignments($item, $request->mentioned_users, auth()->id());
         }
 
@@ -109,7 +109,7 @@ class ItemController extends Controller
         $this->itemService->updateItem($item, $request->validated());
 
         // Sync mentioned users to task_assignments
-        if ($request->has('mentioned_users')) {
+        if ($item->type === 'TASK' && $request->has('mentioned_users')) {
             TaskAssignmentService::syncAssignments($item, $request->mentioned_users ?? [], auth()->id());
         }
 
