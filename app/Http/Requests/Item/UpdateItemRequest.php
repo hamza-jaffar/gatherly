@@ -26,6 +26,8 @@ class UpdateItemRequest extends FormRequest
             'description' => 'nullable|string',
             'status' => 'sometimes|required|in:TODO,IN_PROGRESS,REVIEW,DONE',
             'due_date' => 'nullable|date',
+            'mentioned_users' => 'nullable|array',
+            'mentioned_users.*' => 'integer|exists:users,id',
         ];
     }
 }

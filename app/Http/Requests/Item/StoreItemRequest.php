@@ -27,6 +27,8 @@ class StoreItemRequest extends FormRequest
             'description' => 'nullable|string',
             'status' => 'required_if:type,TASK|nullable|in:TODO,IN_PROGRESS,REVIEW,DONE',
             'due_date' => 'nullable|date',
+            'mentioned_users' => 'nullable|array',
+            'mentioned_users.*' => 'integer|exists:users,id',
         ];
     }
 }

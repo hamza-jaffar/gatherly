@@ -49,4 +49,29 @@ class SpaceMemberService
     {
         return $space->users()->detach($userId);
     }
+
+    /**
+     * Search members for @mention autocomplete
+     * Returns minimal user payload (id, name, email, avatar)
+     */
+    public static function searchMembers(Space $space, string $query)
+    {
+        return $space->users()
+            ->where(function ($q) use ($query) {
+                $q->where('first_name', 'like', "%{$query}%")
+                    ->orWhere('last_name', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.avatar')
+            ->limit(10)
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => trim("{$user->first_name} {$user->last_name}"),
+                    'email' => $user->email,
+                    'avatar' => $user->avatar,
+                ];
+            });
+    }
 }

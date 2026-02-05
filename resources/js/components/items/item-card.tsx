@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { MoreVertical, Calendar, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { router } from '@inertiajs/react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, JSX } from 'react';
 import { toast } from 'sonner';
 import {
     STATUS_CONFIG,
@@ -17,6 +17,7 @@ import {
 } from '../../../contants/item-colors';
 import { Item } from '@/types/space';
 import { UserInfo } from '../user-info';
+import { cn } from '@/lib/utils';
 
 interface ItemCardProps {
     item: Item;
@@ -70,6 +71,52 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
             rotation: rotClass,
         };
     }, [item.id]);
+
+    // Format text with mentions
+    const renderDescription = (text: string | null, isSticky = false) => {
+        if (!text) return null;
+
+        const parts: (string | JSX.Element)[] = [];
+        let lastIndex = 0;
+        const regex = /\{user_id:(\d+),name:([^}]+)\}/g;
+        let match;
+        let key = 0;
+
+        while ((match = regex.exec(text)) !== null) {
+            // Add text before mention
+            if (match.index > lastIndex) {
+                parts.push(text.substring(lastIndex, match.index));
+            }
+
+            // Add mention badge
+            const userId = match[1];
+            const userName = match[2];
+
+            parts.push(
+                <Badge
+                    key={`mention-${userId}-${key++}`}
+                    variant={isSticky ? 'secondary' : 'outline'}
+                    className={cn(
+                        'mx-0.5 inline-flex border-0 align-middle text-[10px] font-normal sm:text-xs',
+                        isSticky
+                            ? 'bg-black/10 text-black hover:bg-black/15'
+                            : 'bg-blue-50 text-blue-700 hover:bg-blue-100',
+                    )}
+                >
+                    @{userName}
+                </Badge>,
+            );
+
+            lastIndex = match.index + match[0].length;
+        }
+
+        // Add remaining text
+        if (lastIndex < text.length) {
+            parts.push(text.substring(lastIndex));
+        }
+
+        return parts;
+    };
 
     if (isNote) {
         return (
@@ -126,9 +173,9 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                 </div>
 
                 <p
-                    className={`relative z-10 line-clamp-6 grow font-serif text-xl leading-relaxed italic ${color.text} opacity-90`}
+                    className={`relative z-10 line-clamp-6 grow font-serif text-xl leading-relaxed italic ${color.text} whitespace-pre-wrap opacity-90`}
                 >
-                    {item.description}
+                    {renderDescription(item.description, true)}
                 </p>
 
                 <div className="relative z-10 mt-6 flex items-center justify-between border-t border-black/10 pt-4">
@@ -215,9 +262,9 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                 </h3>
 
                 {item.description && (
-                    <p className="line-clamp-4 text-sm leading-relaxed text-slate-600">
-                        {item.description}
-                    </p>
+                    <div className="line-clamp-4 text-sm leading-relaxed whitespace-pre-wrap text-slate-600">
+                        {renderDescription(item.description)}
+                    </div>
                 )}
 
                 <div className="flex items-center justify-between border-t border-slate-50 pt-3">

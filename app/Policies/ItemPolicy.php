@@ -26,16 +26,13 @@ class ItemPolicy
      */
     public function create(User $user, Space $space): bool
     {
+        // Space owner can always create
         if ($user->id === $space->created_by) {
             return true;
         }
 
-        $membership = $space->users()->where('user_id', $user->id)->first();
-        if (!$membership) {
-            return false;
-        }
-
-        return in_array($membership->pivot->role, ['admin', 'editor']);
+        // Any space member can create items
+        return $space->users()->where('user_id', $user->id)->exists();
     }
 
     /**

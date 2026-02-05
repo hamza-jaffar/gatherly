@@ -97,10 +97,6 @@ export default function ItemList({
         );
     }
 
-    /* ----------------------------------
-     * FULL VARIANT (Items workspace)
-     * ---------------------------------- */
-
     const filterType = filters?.type || 'ALL';
     const filterStatus = filters?.status || 'ALL';
 
@@ -119,7 +115,6 @@ export default function ItemList({
 
     return (
         <div className="space-y-6">
-            {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 className="text-lg font-semibold">Items</h2>
