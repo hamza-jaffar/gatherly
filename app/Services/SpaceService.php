@@ -80,6 +80,8 @@ class SpaceService
                 'slug' => $slug,
             ]);
 
+            $space->users()->attach($userId, ['role' => 'admin']);
+
             ActivityLog::create([
                 'user_id' => $userId,
                 'action' => 'created',

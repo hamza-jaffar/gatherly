@@ -266,7 +266,7 @@ export default function MentionInput({
                 className={cn(
                     'min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
                     'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
-                    'overflow-y-auto break-words whitespace-pre-wrap disabled:cursor-not-allowed disabled:opacity-50',
+                    'overflow-y-auto wrap-break-word whitespace-pre-wrap disabled:cursor-not-allowed disabled:opacity-50',
                 )}
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
