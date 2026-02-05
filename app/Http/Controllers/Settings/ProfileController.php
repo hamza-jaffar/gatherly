@@ -42,7 +42,7 @@ class ProfileController extends Controller
         // Handle profile picture upload
         if ($request->hasFile('avatar')) {
             $user->avatar = FileHelper::replace(
-                $user->avatar,
+                $oldValues['avatar'] ?? null,
                 $request->file('avatar'),
                 'avatars'
             );
