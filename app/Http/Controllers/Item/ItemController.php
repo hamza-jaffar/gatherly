@@ -30,9 +30,10 @@ class ItemController extends Controller
 
         $items->getCollection()->transform(function ($item) use ($request) {
             $item->can = [
-                'update' => $request->user()->can('update', $item),
-                'delete' => $request->user()->can('delete', $item),
+                'update' => $request->user() ? $request->user()->can('update', $item) : false,
+                'delete' => $request->user() ? $request->user()->can('delete', $item) : false,
             ];
+
             return $item;
         });
 
@@ -48,7 +49,7 @@ class ItemController extends Controller
             'items' => $items,
             'filters' => $request->only(['type', 'status']),
             'can' => [
-                'createItem' => $request->user()->can('create', [Item::class, $space]),
+                'createItem' => $request->user() ? $request->user()->can('create', [Item::class, $space]) : false,
             ],
         ]);
     }
