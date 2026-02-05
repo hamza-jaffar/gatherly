@@ -19,7 +19,7 @@ export function UserInfo({
                     src={`/storage/${user.avatar}`}
                     alt={mergeNames(user.first_name, user.last_name)}
                 />
-                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                <AvatarFallback className="bg-primary/5 text-xs font-bold text-primary">
                     {getInitials(mergeNames(user.first_name, user.last_name))}
                 </AvatarFallback>
             </Avatar>

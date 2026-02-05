@@ -24,9 +24,10 @@ class SpaceController extends Controller
         $spaces = SpaceService::index($request->all());
 
         $spaces->getCollection()->transform(function ($space) use ($request) {
+            $user = $request->user();
             $space->can = [
-                'update' => $request->user()->can('update', $space),
-                'delete' => $request->user()->can('delete', $space),
+                'update' => $user ? $user->can('update', $space) : false,
+                'delete' => $user ? $user->can('delete', $space) : false,
             ];
 
             return $space;
@@ -78,9 +79,10 @@ class SpaceController extends Controller
             $items = ItemService::getItems($space->id, 5);
 
             $items->transform(function ($item) use ($request) {
+                $user = $request->user();
                 $item->can = [
-                    'update' => $request->user()->can('update', $item),
-                    'delete' => $request->user()->can('delete', $item),
+                    'update' => $user ? $user->can('update', $item) : false,
+                    'delete' => $user ? $user->can('delete', $item) : false,
                 ];
 
                 return $item;
@@ -92,10 +94,10 @@ class SpaceController extends Controller
                 'space' => $space,
                 'items' => $items,
                 'can' => [
-                    'update' => $request->user()->can('update', $space),
-                    'delete' => $request->user()->can('delete', $space),
-                    'manageMembers' => $request->user()->can('manageMembers', $space),
-                    'createItem' => $request->user()->can('create', [\App\Models\Item::class, $space]),
+                    'update' => $request->user() ? $request->user()->can('update', $space) : false,
+                    'delete' => $request->user() ? $request->user()->can('delete', $space) : false,
+                    'manageMembers' => $request->user() ? $request->user()->can('manageMembers', $space) : false,
+                    'createItem' => $request->user() ? $request->user()->can('create', [\App\Models\Item::class, $space]) : false,
                 ],
             ]);
 

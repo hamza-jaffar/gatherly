@@ -33,12 +33,10 @@ export default function ItemsIndex({
 }: Props) {
     const [openCreateItemModal, setOpenCreateItemModal] = useState(false);
 
-    // Local State for Pagination
     const [itemsList, setItemsList] = useState(initialItems.data);
     const [nextCursor, setNextCursor] = useState(initialItems.next_cursor);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    // Sync state when initialItems changes (e.g. on filter change)
     useEffect(() => {
         setItemsList(initialItems.data);
         setNextCursor(initialItems.next_cursor);

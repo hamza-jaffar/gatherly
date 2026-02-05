@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import MentionInput from '@/components/items/mention-input';
 import {
     Select,
     SelectContent,
@@ -37,6 +38,7 @@ export default function ItemCreateForm({
         description: '',
         status: 'TODO',
         due_date: '',
+        mentioned_users: [] as number[],
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -103,13 +105,17 @@ export default function ItemCreateForm({
 
                         <div className="grid gap-2">
                             <Label htmlFor="description">Description</Label>
-                            <Textarea
+                            <MentionInput
                                 id="description"
                                 value={data.description}
-                                onChange={(e) =>
-                                    setData('description', e.target.value)
+                                onChange={(value) =>
+                                    setData('description', value)
                                 }
-                                placeholder="Add some details..."
+                                onMentionedUsersChange={(userIds) =>
+                                    setData('mentioned_users', userIds)
+                                }
+                                spaceSlug={spaceSlug}
+                                placeholder="Add some details... Type @ to mention members"
                                 rows={3}
                             />
                             {errors.description && (

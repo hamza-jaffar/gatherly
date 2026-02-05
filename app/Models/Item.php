@@ -30,7 +30,7 @@ class Item extends Model
         return $this->belongsTo(Space::class);
     }
 
-    public function createdBy()
+    public function owner()
     {
         return $this->belongsTo(User::class, 'created_by');
     }

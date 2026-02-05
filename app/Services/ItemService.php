@@ -15,7 +15,7 @@ class ItemService
      */
     public function listItems(Space $space, array $filters = []): CursorPaginator
     {
-        $query = Item::where('space_id', $space->id);
+        $query = Item::where('space_id', $space->id)->with('owner');
 
         if (isset($filters['type']) && $filters['type'] !== 'ALL') {
             $query->where('type', $filters['type']);

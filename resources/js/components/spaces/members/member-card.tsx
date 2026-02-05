@@ -11,20 +11,9 @@ import {
 import { MoreHorizontal, Shield, UserMinus, UserCheck } from 'lucide-react';
 import { MemberRoleBadge } from './member-role-badge';
 import { router } from '@inertiajs/react';
-import { toast } from 'sonner';
 import { mergeNames } from '@/lib/utils';
-
-interface Member {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    avatar: string | null;
-    pivot: {
-        role: string;
-        joined_at: string;
-    };
-}
+import { Member } from '@/types/space';
+import { useInitials } from '@/hooks/use-initials';
 
 interface MemberCardProps {
     member: Member;
@@ -39,6 +28,8 @@ export function MemberCard({
     isOwner,
     currentUserIsAdmin,
 }: MemberCardProps) {
+    const getInitials = useInitials();
+
     const updateRole = (role: string) => {
         router.put(
             `/spaces/${spaceSlug}/members/${member.id}`,
@@ -73,7 +64,7 @@ export function MemberCard({
                         src={`/storage/${member.avatar}` || undefined}
                     />
                     <AvatarFallback className="bg-primary/5 text-xs font-bold text-primary">
-                        {mergeNames(member.first_name, member.last_name)}
+                        {getInitials(name)}
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">

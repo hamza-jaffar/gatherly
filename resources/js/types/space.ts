@@ -28,3 +28,26 @@ export interface Space {
         createItem: boolean;
     };
 }
+
+export interface Item {
+    id: number;
+    title: string;
+    description: string | null;
+    type: 'TASK' | 'NOTE';
+    status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | null;
+    due_date: string | null;
+    slug: string;
+    space_id: number;
+    can?: {
+        update: boolean;
+        delete: boolean;
+    };
+    owner: User;
+}
+
+export interface Member extends User {
+    pivot: {
+        role: string;
+        joined_at: string;
+    };
+}
