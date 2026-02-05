@@ -11,20 +11,7 @@ import { Plus, Filter, ArrowRight, Loader2 } from 'lucide-react';
 import { router, Link, usePage } from '@inertiajs/react';
 import { SharedData } from '@/types';
 import { useEffect, useRef } from 'react';
-
-interface Item {
-    id: number;
-    title: string;
-    description: string | null;
-    type: 'TASK' | 'NOTE';
-    status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | null;
-    due_date: string | null;
-    space_id: number;
-    can?: {
-        update: boolean;
-        delete: boolean;
-    };
-}
+import { Item } from '@/types/space';
 
 interface ItemListProps {
     items: Item[];
@@ -80,19 +67,6 @@ export default function ItemList({
     if (variant === 'summary') {
         return (
             <div className="space-y-4">
-                {/* <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-muted-foreground">
-                        Recent items
-                    </h3>
-                    <Link
-                        href={`/spaces/${spaceSlug}/items`}
-                        className="flex cursor-pointer items-center gap-1 text-xs text-primary hover:underline"
-                    >
-                        View all
-                        <ArrowRight className="h-3 w-3" />
-                    </Link>
-                </div> */}
-
                 {items.length > 0 ? (
                     <div className="space-y-2">
                         {items.map((item) => (

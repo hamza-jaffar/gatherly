@@ -15,20 +15,8 @@ import {
     STATUS_CONFIG,
     STICKY_NOTE_COLORS,
 } from '../../../contants/item-colors';
-
-interface Item {
-    id: number;
-    title: string;
-    description: string | null;
-    type: 'TASK' | 'NOTE';
-    status: 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE' | null;
-    due_date: string | null;
-    space_id: number;
-    can?: {
-        update: boolean;
-        delete: boolean;
-    };
-}
+import { Item } from '@/types/space';
+import { UserInfo } from '../user-info';
 
 interface ItemCardProps {
     item: Item;
@@ -37,6 +25,8 @@ interface ItemCardProps {
 
 export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
+
+    console.log(item);
 
     const updateStatus = (newStatus: Item['status']) => {
         if (item.status === newStatus) return;
@@ -144,6 +134,9 @@ export default function ItemCard({ item, spaceSlug }: ItemCardProps) {
                 </p>
 
                 <div className="relative z-10 mt-6 flex items-center justify-between border-t border-black/10 pt-4">
+                    <div className="flex items-center gap-2">
+                        <UserInfo user={item.owner} />
+                    </div>
                     {/* Subtle paper texture hint */}
                     <span
                         className={`text-[11px] font-black tracking-widest uppercase opacity-30 ${color.text}`}
