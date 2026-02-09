@@ -10,6 +10,7 @@ import { edit } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
 import type { NavItem } from '@/types';
+import { activityLog } from '@/routes';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -30,6 +31,11 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Appearance',
         href: editAppearance(),
+        icon: null,
+    },
+    {
+        title: 'Activity Log',
+        href: activityLog().url,
         icon: null,
     },
 ];

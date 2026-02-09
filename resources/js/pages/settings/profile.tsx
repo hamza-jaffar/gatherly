@@ -15,8 +15,13 @@ import type { BreadcrumbItem, SharedData } from '@/types';
 import { useRef, useState } from 'react';
 import { Camera, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { dashboard } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard().url,
+    },
     {
         title: 'Profile settings',
         href: edit().url,
