@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import ItemList from '@/components/items/item-list';
 import ItemCreateForm from '@/components/items/item-create-form';
@@ -7,8 +7,6 @@ import { BreadcrumbItem } from '@/types';
 import spaceRoute from '@/routes/space';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
 import itemRoute from '@/routes/item';
 import axios from 'axios';
 
