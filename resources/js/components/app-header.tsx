@@ -30,7 +30,7 @@ import {
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
-import { cn, toUrl } from '@/lib/utils';
+import { cn, mergeNames, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
@@ -93,7 +93,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     Navigation Menu
                                 </SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
-                                    <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
+                                    <AppLogoIcon />
                                 </SheetHeader>
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
@@ -224,10 +224,18 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     <Avatar className="size-8 overflow-hidden rounded-full">
                                         <AvatarImage
                                             src={auth.user.avatar}
-                                            alt={auth.user.name}
+                                            alt={mergeNames(
+                                                auth.user.last_name,
+                                                auth.user.last_name,
+                                            )}
                                         />
                                         <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                            {getInitials(auth.user.name)}
+                                            {getInitials(
+                                                mergeNames(
+                                                    auth.user.last_name,
+                                                    auth.user.last_name,
+                                                ),
+                                            )}
                                         </AvatarFallback>
                                     </Avatar>
                                 </Button>

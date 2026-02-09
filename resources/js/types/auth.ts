@@ -25,3 +25,16 @@ export type TwoFactorSetupData = {
 export type TwoFactorSecretKey = {
     secretKey: string;
 };
+
+export type Notification = {
+    id: number;
+    title: string;
+    message: string;
+    is_read: boolean;
+    read_at: string;
+    type: string;
+    receiver_id: number;
+    sender_id: number;
+    created_at: string;
+    updated_at: string;
+};
