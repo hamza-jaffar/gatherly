@@ -5,20 +5,26 @@ namespace App\Http\Controllers;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
-    public function getCurrentUserNotifications()
+    public function getCurrentUserNotifications(Request $request)
     {
         try {
             $notifications = NotificationService::getCurrentUserNotification();
+            if ($request->ajax()) {
+                return response()->json($notifications, 200);
+            }
+            return Inertia::render("notifications/index");
 
-            return response()->json($notifications, 200);
         } catch (\Exception $e) {
-            Log::get("Fail to get notification: " . $e->getMessage());
-            return response()->json([
-                'message' => "Fail to load notifications",
-            ], 500);
+            if ($request->ajax()) {
+                Log::get("Fail to get notification: " . $e->getMessage());
+                return response()->json([
+                    'message' => "Fail to load notifications",
+                ], 500);
+            }
         }
     }
 

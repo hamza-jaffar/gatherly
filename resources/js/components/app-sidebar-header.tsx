@@ -9,7 +9,6 @@ import {
     BellRingIcon,
     LogIn,
     MailOpen,
-    MessageSquareMore,
     OctagonX,
     RotateCw,
 } from 'lucide-react';
@@ -65,6 +64,7 @@ export function AppSidebarHeader({
             const response = await fetch(getCurrentUserNotification().url, {
                 headers: {
                     Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
             });
 
@@ -89,6 +89,7 @@ export function AppSidebarHeader({
 
     const MarkNotificationAsRead = (notificationId: number) => {
         router.post(markNotificationAsRead(notificationId));
+        loadNotifications();
     };
 
     return (
@@ -119,7 +120,7 @@ export function AppSidebarHeader({
                     </Button>
 
                     {openNotificationBox && (
-                        <div className="absolute right-0 mt-2 w-80 rounded-xl border bg-background shadow-lg">
+                        <div className="absolute right-0 z-40 mt-2 w-80 rounded-xl border bg-background shadow-lg">
                             <div className="flex items-center justify-between border-b px-4 py-2 font-medium">
                                 <span>Notifications</span>
 

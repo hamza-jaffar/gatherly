@@ -18,7 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('/get-notifications', [NotificationController::class, 'getCurrentUserNotifications'])->name('getCurrentUserNotification');
+    Route::get('/notifications', [NotificationController::class, 'getCurrentUserNotifications'])->name('getCurrentUserNotification');
     Route::post('/mark-notification-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('markNotificationAsRead');
 });
 
