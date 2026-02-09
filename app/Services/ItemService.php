@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\SlugHelper;
 use App\Models\Item;
 use App\Models\Space;
 use App\Models\ActivityLog;
@@ -61,10 +62,26 @@ class ItemService
         }
 
         // Generate unique slug
-        $data['slug'] = $this->generateUniqueSlug($data['title']);
+        $data['slug'] = SlugHelper::create($data['title'], "items");
 
         return DB::transaction(function () use ($data) {
             $item = Item::create($data);
+
+            $description = $data['description'] ?? null;
+
+            $receiverId = null;
+
+            if ($description) {
+                preg_match('/user_id\s*:\s*(\d+)/', $description, $matches);
+                $receiverId = isset($matches[1]) ? (int) $matches[1] : null;
+            }
+
+            $user = Auth::user();
+
+            $title = "Some one mension you in the ". $item->type;
+            $message = $user->first_name. " ". $user->last_name. " mension you in the ". $item->type;
+
+            NotificationService::sendSystemNotification($title, $message, $receiverId);
 
             ActivityLog::create([
                 'user_id' => Auth::id(),
@@ -87,7 +104,7 @@ class ItemService
     {
         // If title changed, update slug
         if (isset($data['title']) && $data['title'] !== $item->title) {
-            $data['slug'] = $this->generateUniqueSlug($data['title']);
+            $data['slug'] = SlugHelper::create($data['title'], "items");
         }
 
         return DB::transaction(function () use ($item, $data) {
@@ -135,21 +152,5 @@ class ItemService
 
             return $deleted;
         });
-    }
-
-    /**
-     * Generate a unique slug for the item.
-     */
-    protected function generateUniqueSlug(string $title): string
-    {
-        $slug = Str::slug($title);
-        $originalSlug = $slug;
-        $count = 1;
-
-        while (Item::where('slug', $slug)->exists()) {
-            $slug = $originalSlug.'-'.$count++;
-        }
-
-        return $slug;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\NotificationType;
 use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
@@ -16,6 +17,11 @@ class Notification extends Model
         'sender_id',
     ];
 
+    protected $casts = [
+        'type' => NotificationType::class,
+        'is_read' => 'boolean',
+        'read_at' => 'datetime',
+    ];
     public function receiver()
     {
         return $this->belongsTo(User::class, 'receiver_id');
