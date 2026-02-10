@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Services\NotificationService;
 use Illuminate\Support\Facades\Log;
@@ -14,10 +15,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/notifications', [NotificationController::class, 'getCurrentUserNotifications'])->name('getCurrentUserNotification');
     Route::post('/mark-notification-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('markNotificationAsRead');
 });
