@@ -1,7 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { activityLog, dashboard } from '@/routes';
-import { BreadcrumbItem, PaginatedActivityLogs, ActivityLog as ActivityLogType } from '@/types';
+import {
+    BreadcrumbItem,
+    PaginatedActivityLogs,
+    ActivityLog as ActivityLogType,
+} from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,15 +65,19 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
     const queryParams: QueryParams = query_params || {};
 
     const [search, setSearch] = useState(queryParams.search ?? '');
-    const [resourceType, setResourceType] = useState(queryParams.resource_type ?? '');
+    const [resourceType, setResourceType] = useState(
+        queryParams.resource_type ?? '',
+    );
     const [sortBy, setSortBy] = useState(queryParams.sort_by ?? 'created_at');
-    const [sortOrder, setSortOrder] = useState(queryParams.sort_order ?? 'desc');
+    const [sortOrder, setSortOrder] = useState(
+        queryParams.sort_order ?? 'desc',
+    );
     const [perPage, setPerPage] = useState(queryParams.per_page ?? '10');
     const [isInitial, setIsInitial] = useState(true);
 
     // Get unique resource types from current data
     const resourceTypes = Array.from(
-        new Set(activities.data.map((item) => item.resource_type))
+        new Set(activities.data.map((item) => item.resource_type)),
     ).sort();
 
     const applyFilters = (
@@ -77,12 +85,14 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
         newResourceType?: string,
         newSortBy?: string,
         newSortOrder?: string,
-        newPerPage?: string
+        newPerPage?: string,
     ) => {
         const searchValue = newSearch !== undefined ? newSearch : search;
-        const typeValue = newResourceType !== undefined ? newResourceType : resourceType;
+        const typeValue =
+            newResourceType !== undefined ? newResourceType : resourceType;
         const sortByValue = newSortBy !== undefined ? newSortBy : sortBy;
-        const sortOrderValue = newSortOrder !== undefined ? newSortOrder : sortOrder;
+        const sortOrderValue =
+            newSortOrder !== undefined ? newSortOrder : sortOrder;
         const perPageValue = newPerPage !== undefined ? newPerPage : perPage;
 
         router.get(
@@ -94,7 +104,7 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                 sort_order: sortOrderValue,
                 per_page: perPageValue,
             },
-            { preserveScroll: true }
+            { preserveScroll: true },
         );
     };
 
@@ -109,8 +119,9 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
     };
 
     const toggleSort = (column: string) => {
-        const newSortOrder = sortBy === column && sortOrder === 'desc' ? 'asc' : 'desc';
-        
+        const newSortOrder =
+            sortBy === column && sortOrder === 'desc' ? 'asc' : 'desc';
+
         setSortBy(column);
         setSortOrder(newSortOrder);
         setTimeout(() => {
@@ -146,9 +157,12 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
 
     const getActionBadgeColor = (action: string) => {
         const actionLower = action.toLowerCase();
-        if (actionLower.includes('create')) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-        if (actionLower.includes('update')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-        if (actionLower.includes('delete')) return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        if (actionLower.includes('create'))
+            return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        if (actionLower.includes('update'))
+            return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+        if (actionLower.includes('delete'))
+            return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
         return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     };
 
@@ -163,7 +177,8 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
     };
 
     const SortIcon = ({ column }: { column: string }) => {
-        if (sortBy !== column) return <ChevronDown className="h-4 w-4 opacity-40" />;
+        if (sortBy !== column)
+            return <ChevronDown className="h-4 w-4 opacity-40" />;
         return sortOrder === 'desc' ? (
             <ChevronDown className="h-4 w-4" />
         ) : (
@@ -182,8 +197,10 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                     {/* Header Section */}
                     <div className="space-y-4">
                         <div>
-                            <h2 className="text-2xl font-bold tracking-tight">Activity Log</h2>
-                            <p className="text-muted-foreground mt-1">
+                            <h2 className="text-2xl font-bold tracking-tight">
+                                Activity Log
+                            </h2>
+                            <p className="mt-1 text-muted-foreground">
                                 Track and monitor all your account activities
                             </p>
                         </div>
@@ -192,18 +209,23 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                         <div className="space-y-4">
                             {/* Search Input */}
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-                                <div className="flex-1 min-w-0">
-                                    <label htmlFor="search" className="block text-sm font-medium mb-2">
+                                <div className="min-w-0 flex-1">
+                                    <label
+                                        htmlFor="search"
+                                        className="mb-2 block text-sm font-medium"
+                                    >
                                         Search
                                     </label>
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
                                             id="search"
                                             type="text"
                                             placeholder="Search by action, resource, or IP..."
                                             value={search}
-                                            onChange={(e) => setSearch(e.target.value)}
+                                            onChange={(e) =>
+                                                setSearch(e.target.value)
+                                            }
                                             className="pl-10"
                                         />
                                     </div>
@@ -215,28 +237,39 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                                         className="flex-1"
                                         title="Reset filters"
                                     >
-                                        <RotateCcw className="h-4 w-4 mr-2" />
+                                        <RotateCcw className="mr-2 h-4 w-4" />
                                         Reset Filters
                                     </Button>
                                 </div>
                             </div>
 
                             {/* Filters Row */}
-                            <div className="grid grid-cols-1 gap-4 items-center sm:grid-cols-3">
+                            <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-3">
                                 {/* Resource Type Filter */}
                                 <div>
-                                    <label htmlFor="resource-type" className="block text-sm font-medium mb-2">
-                                        <Filter className="inline h-4 w-4 mr-2" />
+                                    <label
+                                        htmlFor="resource-type"
+                                        className="mb-2 block text-sm font-medium"
+                                    >
+                                        <Filter className="mr-2 inline h-4 w-4" />
                                         Resource Type
                                     </label>
-                                    <Select value={resourceType} onValueChange={setResourceType}>
+                                    <Select
+                                        value={resourceType}
+                                        onValueChange={setResourceType}
+                                    >
                                         <SelectTrigger id="resource-type">
                                             <SelectValue placeholder="All resources" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All resources</SelectItem>
+                                            <SelectItem value="all">
+                                                All resources
+                                            </SelectItem>
                                             {resourceTypes.map((type) => (
-                                                <SelectItem key={type} value={type}>
+                                                <SelectItem
+                                                    key={type}
+                                                    value={type}
+                                                >
                                                     {type}
                                                 </SelectItem>
                                             ))}
@@ -245,18 +278,32 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                                 </div>
 
                                 <div>
-                                    <label htmlFor="per-page" className="block text-sm font-medium mb-2">
+                                    <label
+                                        htmlFor="per-page"
+                                        className="mb-2 block text-sm font-medium"
+                                    >
                                         Results Per Page
                                     </label>
-                                    <Select value={perPage} onValueChange={setPerPage}>
+                                    <Select
+                                        value={perPage}
+                                        onValueChange={setPerPage}
+                                    >
                                         <SelectTrigger id="per-page">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="10">10 per page</SelectItem>
-                                            <SelectItem value="25">25 per page</SelectItem>
-                                            <SelectItem value="50">50 per page</SelectItem>
-                                            <SelectItem value="100">100 per page</SelectItem>
+                                            <SelectItem value="10">
+                                                10 per page
+                                            </SelectItem>
+                                            <SelectItem value="25">
+                                                25 per page
+                                            </SelectItem>
+                                            <SelectItem value="50">
+                                                50 per page
+                                            </SelectItem>
+                                            <SelectItem value="100">
+                                                100 per page
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -266,12 +313,18 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                             {(search || resourceType) && (
                                 <div className="flex flex-wrap gap-2 pt-2">
                                     {search && (
-                                        <Badge variant="secondary" className="gap-1">
+                                        <Badge
+                                            variant="secondary"
+                                            className="gap-1"
+                                        >
                                             Search: {search}
                                         </Badge>
                                     )}
                                     {resourceType && (
-                                        <Badge variant="secondary" className="gap-1">
+                                        <Badge
+                                            variant="secondary"
+                                            className="gap-1"
+                                        >
                                             Type: {resourceType}
                                         </Badge>
                                     )}
@@ -281,21 +334,24 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                     </div>
 
                     {/* Table Section */}
-                    <div className="rounded-lg border bg-card overflow-hidden">
+                    <div className="overflow-hidden rounded-lg border bg-card">
                         {activities.data.length === 0 ? (
                             <div className="p-12 text-center">
-                                <p className="text-muted-foreground text-lg">
-                                    No activities found. Try adjusting your filters.
+                                <p className="text-lg text-muted-foreground">
+                                    No activities found. Try adjusting your
+                                    filters.
                                 </p>
                             </div>
                         ) : (
                             <>
                                 <Table>
-                                    <TableHeader>
+                                    <TableHeader >
                                         <TableRow className="bg-muted/50 hover:bg-muted/50">
                                             <TableHead
-                                                className="cursor-pointer select-none hover:bg-muted transition-colors"
-                                                onClick={() => toggleSort('action')}
+                                                className="cursor-pointer transition-colors select-none hover:bg-muted"
+                                                onClick={() =>
+                                                    toggleSort('action')
+                                                }
                                             >
                                                 <div className="flex items-center gap-2">
                                                     Action
@@ -303,8 +359,10 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                                                 </div>
                                             </TableHead>
                                             <TableHead
-                                                className="cursor-pointer select-none hover:bg-muted transition-colors"
-                                                onClick={() => toggleSort('resource_type')}
+                                                className="cursor-pointer transition-colors select-none hover:bg-muted"
+                                                onClick={() =>
+                                                    toggleSort('resource_type')
+                                                }
                                             >
                                                 <div className="flex items-center gap-2">
                                                     Resource Type
@@ -312,18 +370,24 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                                                 </div>
                                             </TableHead>
                                             <TableHead
-                                                className="cursor-pointer select-none hover:bg-muted transition-colors"
-                                                onClick={() => toggleSort('resource_id')}
+                                                className="cursor-pointer transition-colors select-none hover:bg-muted"
+                                                onClick={() =>
+                                                    toggleSort('resource_id')
+                                                }
                                             >
                                                 <div className="flex items-center gap-2">
                                                     Resource ID
                                                     <SortIcon column="resource_id" />
                                                 </div>
                                             </TableHead>
-                                            <TableHead className="hidden sm:table-cell">IP Address</TableHead>
+                                            <TableHead className="hidden sm:table-cell">
+                                                IP Address
+                                            </TableHead>
                                             <TableHead
-                                                className="cursor-pointer select-none hover:bg-muted transition-colors text-right"
-                                                onClick={() => toggleSort('created_at')}
+                                                className="cursor-pointer text-right transition-colors select-none hover:bg-muted"
+                                                onClick={() =>
+                                                    toggleSort('created_at')
+                                                }
                                             >
                                                 <div className="flex items-center justify-end gap-2">
                                                     Date
@@ -333,65 +397,91 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {activities.data.map((activity: ActivityLogType) => (
-                                            <TableRow
-                                                key={activity.id}
-                                                className="hover:bg-muted/50 transition-colors"
-                                            >
-                                                <TableCell>
-                                                    <Badge
-                                                        className={`${getActionBadgeColor(
-                                                            activity.action
-                                                        )} font-semibold`}
-                                                    >
-                                                        {activity.action}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell className="font-medium">
-                                                    {activity.resource_type}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                                        #{activity.resource_id}
-                                                    </code>
-                                                </TableCell>
-                                                <TableCell className="hidden sm:table-cell text-sm">
-                                                    {activity.ip_address ? (
-                                                        <code className="bg-muted px-2 py-1 rounded text-xs font-mono">
-                                                            {activity.ip_address}
+                                        {activities.data.map(
+                                            (activity: ActivityLogType) => (
+                                                <TableRow
+                                                    key={activity.id}
+                                                    className="transition-colors hover:bg-muted/50"
+                                                >
+                                                    <TableCell>
+                                                        <Badge
+                                                            className={`${getActionBadgeColor(
+                                                                activity.action,
+                                                            )} font-semibold`}
+                                                        >
+                                                            {activity.action}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="font-medium">
+                                                        {activity.resource_type}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <code className="rounded bg-muted px-2 py-1 font-mono text-xs">
+                                                            #
+                                                            {
+                                                                activity.resource_id
+                                                            }
                                                         </code>
-                                                    ) : (
-                                                        <span className="text-muted-foreground">N/A</span>
-                                                    )}
-                                                </TableCell>
-                                                <TableCell className="text-right text-sm text-muted-foreground">
-                                                    {formatDate(activity.created_at)}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-sm sm:table-cell">
+                                                        {activity.ip_address ? (
+                                                            <code className="rounded bg-muted px-2 py-1 font-mono text-xs">
+                                                                {
+                                                                    activity.ip_address
+                                                                }
+                                                            </code>
+                                                        ) : (
+                                                            <span className="text-muted-foreground">
+                                                                N/A
+                                                            </span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="text-right text-sm text-muted-foreground">
+                                                        {formatDate(
+                                                            activity.created_at,
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ),
+                                        )}
                                     </TableBody>
                                 </Table>
 
-                                {/* Pagination Section */}
                                 <div className="border-t bg-muted/30 px-4 py-4 sm:px-6">
                                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                         <p className="text-sm text-muted-foreground">
                                             Showing{' '}
-                                            <span className="font-semibold">{activities.from}</span> to{' '}
-                                            <span className="font-semibold">{activities.to}</span> of{' '}
-                                            <span className="font-semibold">{activities.total}</span> activities
+                                            <span className="font-semibold">
+                                                {activities.from}
+                                            </span>{' '}
+                                            to{' '}
+                                            <span className="font-semibold">
+                                                {activities.to}
+                                            </span>{' '}
+                                            of{' '}
+                                            <span className="font-semibold">
+                                                {activities.total}
+                                            </span>{' '}
+                                            activities
                                         </p>
 
                                         <div className="flex gap-2">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                disabled={!activities.prev_page_url}
+                                                disabled={
+                                                    !activities.prev_page_url
+                                                }
                                                 onClick={() => {
-                                                    if (activities.prev_page_url) {
-                                                        router.visit(activities.prev_page_url, {
-                                                            preserveScroll: true,
-                                                        });
+                                                    if (
+                                                        activities.prev_page_url
+                                                    ) {
+                                                        router.visit(
+                                                            activities.prev_page_url,
+                                                            {
+                                                                preserveScroll: true,
+                                                            },
+                                                        );
                                                     }
                                                 }}
                                             >
@@ -400,52 +490,77 @@ const ActivityLog = ({ activities, query_params = {} }: Props) => {
                                             </Button>
 
                                             {/* Page Numbers */}
-                                            <div className="hidden sm:flex items-center gap-1">
-                                                {activities.links.map((link, index) => {
-                                                    if (!link.label) return null;
+                                            <div className="hidden items-center gap-1 sm:flex">
+                                                {activities.links
+                                                    .filter(
+                                                        (link) =>
+                                                            link.label !==
+                                                                '&laquo; Previous' &&
+                                                            link.label !==
+                                                                'Next &raquo;',
+                                                    )
+                                                    .map((link, index) => {
+                                                        const isEllipsis =
+                                                            link.label ===
+                                                            '...';
+                                                        const isActive =
+                                                            link.active;
 
-                                                    const isEllipsis = link.label === '...';
-                                                    const isActive = link.active;
+                                                        if (isEllipsis) {
+                                                            return (
+                                                                <span
+                                                                    key={index}
+                                                                    className="px-2 py-1 text-muted-foreground"
+                                                                >
+                                                                    …
+                                                                </span>
+                                                            );
+                                                        }
 
-                                                    if (isEllipsis) {
                                                         return (
-                                                            <span
+                                                            <Button
                                                                 key={index}
-                                                                className="px-2 py-1 text-muted-foreground"
+                                                                variant={
+                                                                    isActive
+                                                                        ? 'default'
+                                                                        : 'outline'
+                                                                }
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    if (
+                                                                        link.url
+                                                                    ) {
+                                                                        router.visit(
+                                                                            link.url,
+                                                                            {
+                                                                                preserveScroll: true,
+                                                                            },
+                                                                        );
+                                                                    }
+                                                                }}
                                                             >
                                                                 {link.label}
-                                                            </span>
+                                                            </Button>
                                                         );
-                                                    }
-
-                                                    return (
-                                                        <Button
-                                                            key={index}
-                                                            variant={isActive ? 'default' : 'outline'}
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                if (link.url) {
-                                                                    router.visit(link.url, {
-                                                                        preserveScroll: true,
-                                                                    });
-                                                                }
-                                                            }}
-                                                        >
-                                                            {link.label}
-                                                        </Button>
-                                                    );
-                                                })}
+                                                    })}
                                             </div>
 
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                disabled={!activities.next_page_url}
+                                                disabled={
+                                                    !activities.next_page_url
+                                                }
                                                 onClick={() => {
-                                                    if (activities.next_page_url) {
-                                                        router.visit(activities.next_page_url, {
-                                                            preserveScroll: true,
-                                                        });
+                                                    if (
+                                                        activities.next_page_url
+                                                    ) {
+                                                        router.visit(
+                                                            activities.next_page_url,
+                                                            {
+                                                                preserveScroll: true,
+                                                            },
+                                                        );
                                                     }
                                                 }}
                                             >
