@@ -1,3 +1,5 @@
+import { BasePagination } from '.';
+
 export type User = {
     id: number;
     first_name: string;
@@ -38,3 +40,21 @@ export type Notification = {
     created_at: string;
     updated_at: string;
 };
+
+export interface ActivityLog {
+    id: number;
+    user_id: number;
+    action: string;
+    resource_type: string;
+    resource_id: number;
+    old_values: Record<string, any> | null;
+    new_values: Record<string, any> | null;
+    ip_address: string | null;
+    user_agent: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PaginatedActivityLogs extends BasePagination {
+    data: ActivityLog[];
+}

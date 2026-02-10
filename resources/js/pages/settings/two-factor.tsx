@@ -11,6 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { disable, enable, show } from '@/routes/two-factor';
 import type { BreadcrumbItem } from '@/types';
+import { dashboard } from '@/routes';
 
 type Props = {
     requiresConfirmation?: boolean;
@@ -18,6 +19,10 @@ type Props = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard().url,
+    },
     {
         title: 'Two-Factor Authentication',
         href: show.url(),

@@ -3,6 +3,7 @@ export type * from './navigation';
 export type * from './ui';
 
 import type { Auth } from './auth';
+import { Link } from './navigation';
 
 export type Flash = {
     success: string;
@@ -36,3 +37,18 @@ export type SharedData = {
     flash: Flash;
     [key: string]: unknown;
 };
+
+export interface BasePagination {
+    current_page: number;
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Link[];
+    next_page_url: any;
+    path: string;
+    per_page: number;
+    prev_page_url: any;
+    to: number;
+    total: number;
+}

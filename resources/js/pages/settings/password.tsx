@@ -11,8 +11,13 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/user-password';
 import type { BreadcrumbItem } from '@/types';
+import { dashboard } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard().url,
+    },
     {
         title: 'Password settings',
         href: edit().url,

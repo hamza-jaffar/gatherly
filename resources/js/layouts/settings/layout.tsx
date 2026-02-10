@@ -10,6 +10,7 @@ import { edit } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
 import type { NavItem } from '@/types';
+import { activityLog } from '@/routes';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -30,6 +31,11 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Appearance',
         href: editAppearance(),
+        icon: null,
+    },
+    {
+        title: 'Activity Log',
+        href: activityLog().url,
         icon: null,
     },
 ];
@@ -78,8 +84,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                 <Separator className="my-6 lg:hidden" />
 
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
+                <div className="flex-1">
+                    <section className="space-y-12">
                         {children}
                     </section>
                 </div>
