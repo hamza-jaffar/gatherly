@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('task_assignments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('task_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('task_id')->constrained('items', 'id')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('status')->nullable();
             $table->string('role')->nullable();
