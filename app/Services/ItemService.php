@@ -6,6 +6,7 @@ use App\Helpers\SlugHelper;
 use App\Models\Item;
 use App\Models\Space;
 use App\Models\ActivityLog;
+use App\Services\TaskAssignmentService;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -109,10 +110,16 @@ class ItemService
 
         return DB::transaction(function () use ($item, $data) {
             $oldValues = $item->toArray();
+            $statusChanged = isset($data['status']) && $data['status'] !== $item->status;
 
             $updated = $item->update($data);
 
             if ($updated) {
+                // If item is a TASK and status changed, update all related task assignments
+                if ($item->type === 'TASK' && $statusChanged) {
+                    TaskAssignmentService::updateTaskAssignmentStatus($item->id, $data['status']);
+                }
+
                 ActivityLog::create([
                     'user_id' => Auth::id(),
                     'action' => 'updated',

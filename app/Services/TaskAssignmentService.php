@@ -71,4 +71,15 @@ class TaskAssignmentService
     {
         TaskAssignment::where('task_id', $item->id)->delete();
     }
+
+    /**
+     * Update status for all task assignments of a specific task
+     */
+    public static function updateTaskAssignmentStatus(int $taskId, string $status): void
+    {
+        TaskAssignment::where('task_id', $taskId)->update([
+            'status' => $status,
+            'updated_at' => now(),
+        ]);
+    }
 }

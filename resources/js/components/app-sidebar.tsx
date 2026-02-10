@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LandPlot, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, FolderOpen, LandPlot, LayoutGrid } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -25,7 +25,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Spaces',
         href: space.index().url,
-        icon: LandPlot,
+        icon: FolderOpen,
     },
 ];
 

@@ -84,7 +84,7 @@ class DashboardService
                 ->where('status', 'in_progress')
                 ->count(),
             'completed' => TaskAssignment::where('task_assignments.user_id', $user->id)
-                ->where('status', 'completed')
+                ->where('status', 'done')
                 ->count(),
         ];
     }
