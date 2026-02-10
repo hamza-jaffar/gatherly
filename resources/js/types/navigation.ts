@@ -12,3 +12,10 @@ export type NavItem = {
     icon?: LucideIcon | null;
     isActive?: boolean;
 };
+
+export interface Link {
+    url?: string;
+    label: string;
+    page?: number;
+    active: boolean;
+}
