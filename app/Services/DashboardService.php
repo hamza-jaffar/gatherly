@@ -32,7 +32,7 @@ class DashboardService
         $totalItems = Item::whereIn('space_id', $spaceIds)->count();
         $totalTasks = TaskAssignment::where('task_assignments.user_id', $user->id)->count();
         $completedTasks = TaskAssignment::where('task_assignments.user_id', $user->id)
-            ->where('status', 'completed')
+            ->where('status', 'done')
             ->count();
 
         return [
